@@ -1,0 +1,9 @@
+sudo: false
+language: node_js
+node_js:
+  - "4"
+
+after_script:
+  - npm run coverage-report
+  - npm run push-coverage
+  - npm run cleanup
