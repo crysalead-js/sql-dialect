@@ -1,4 +1,4 @@
-import { PostgreSql } from '../../../..';
+import { PostgreSql } from '../../../../src';
 
 describe("PostgreSql Delete", function() {
 

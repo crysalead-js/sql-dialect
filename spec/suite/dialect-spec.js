@@ -1,4 +1,4 @@
-import { Dialect } from '../..';
+import { Dialect } from '../../src';
 
 describe("Dialect", function() {
 

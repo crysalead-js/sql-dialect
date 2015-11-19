@@ -1,4 +1,4 @@
-import { Sqlite } from '../../../..';
+import { Sqlite } from '../../../../src';
 
 describe("Sqlite CreateTable", function() {
 

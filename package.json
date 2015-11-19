@@ -1,6 +1,6 @@
 {
   "name": "sql-dialect",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "SQL Builder",
   "license": "MIT",
   "repository": {
@@ -11,6 +11,8 @@
     "sql"
   ],
   "scripts": {
+    "compile": "babel -d lib/ src/",
+    "prepublish": "npm run compile",
     "test": "mocha --compilers babel:babel-core/register",
     "coverage-report": "babel-node node_modules/isparta/bin/isparta cover _mocha --i \"src/**/*.js\"",
     "push-coverage": "cat ./coverage/lcov.info | coveralls",
@@ -20,6 +22,7 @@
     "extend-merge": "^1.0.3",
     "string-placeholder": "^1.0.1"
   },
+  "main": "lib/index.js",
   "devDependencies": {
     "babel-cli": "^6.1.18",
     "babel-core": "^6.1.21",

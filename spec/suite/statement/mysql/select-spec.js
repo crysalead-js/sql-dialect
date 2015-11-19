@@ -1,4 +1,4 @@
-import { MySql } from '../../../..';
+import { MySql } from '../../../../src';
 
 describe("MySql Select", function() {
 

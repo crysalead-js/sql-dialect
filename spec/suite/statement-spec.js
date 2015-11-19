@@ -1,4 +1,4 @@
-import { Statement } from '../..';
+import { Statement } from '../../src';
 
 describe("Statement", function() {
 
