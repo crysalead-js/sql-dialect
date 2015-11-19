@@ -528,6 +528,17 @@ describe("Dialect", function() {
 
     });
 
+    it("preserves passed parameters", function() {
+
+      this.dialect.map('tinyint', 'integer');
+
+      var column = { use: 'tinyint', 'default': 1 }
+      expect(this.dialect.mapped(column)).toBe('integer');
+
+      expect(column).toEqual({ use: 'tinyint', 'default': 1 });
+
+    });
+
     it("throws an exception when options can't many any type", function() {
 
       this.dialect.map('tinyint', 'boolean', { length: 1 });

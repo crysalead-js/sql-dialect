@@ -289,17 +289,17 @@ class Dialect {
   /**
    * Gets a mapped type.
    *
-   * @param  mixed options The column definition or the database type.
-   * @param  array config  The type definition.
-   * @return array         Return the type definition.
+   * @param  Object column The column definition or the database type.
+   * @return Object        Return the mapped column definition.
    */
-  mapped(options) {
-    var use;
-    if (typeof options === 'object') {
+  mapped(column) {
+    var options, use;
+    if (typeof column === 'object') {
+      options = extend({}, column);
       use = options.use;
       delete options.use;
     } else {
-      use = options;
+      use = column;
       options = {};
     }
 
