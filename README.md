@@ -5,16 +5,18 @@
 
 This library provides query builders independent of any particular database connection library.
 
+## Install
+
+```bash
+npm install sql-dialect
+```
+
 ## Main Features
 
 * Supports MySQL, PostgreSQL and Sqlite
 * Uses the [prefix notation](https://en.wikipedia.org/wiki/Polish_notation) for building queries
 * Supports `SELECT`, `UPDATE`, `INSERT` and `DELETE`
 * Supports `CREATE TABLE` and `DROP TABLE`
-
-## Community
-
-To ask questions, provide feedback or otherwise communicate with the team, join us on `#chaos` on Freenode.
 
 ## Documentation
 
@@ -29,7 +31,7 @@ To ask questions, provide feedback or otherwise communicate with the team, join 
 
 Let's start by instantiating a `MySql` dialect class:
 
-```php
+```js
 var SQL = require('sql-dialect');
 
 var dialect = new SQL.MySql();
@@ -37,8 +39,7 @@ var dialect = new SQL.MySql();
 
 Once instantiated, it's possible to use the dialect`s `.statement()` method to create query instances like in the following:
 
-```php
-<?php
+```js
 var select = dialect.statement('select');
 var insert = dialect.statement('insert');
 var update = dialect.statement('update');
@@ -46,12 +47,11 @@ var delete = dialect.statement('delete');
 
 var createTable = dialect.statement('create table');
 var dropTable = dialect.statement('drop table');
-?>
 ```
 
 Then to generate the corresponding SQL, we need to use either `toString()` or `__toString()`:
 
-```php
+```js
 select.from('mytable');
 echo select.toString(); // SELECT * FROM "mytable"
 echo String(select);    // SELECT * FROM "mytable"
@@ -61,9 +61,9 @@ Since the SQL generated is independent of any particular database connection lib
 
 ### Quoting
 
-By default string values are automatically quoted, however some database connections provide their own [built-in quoting method](http://php.net/manual/en/pdo.quote.php). If you are not using PDO you will probably want to override the default quoting handler. To do so, you'ss need to inject your handler to the dialect instance like in the following:
+By default string values are automatically quoted, however some database connections provide their own built-in quoting method. If you are not using PDO you will probably want to override the default quoting handler. To do so, you'ss need to inject your handler to the dialect instance like in the following:
 
-```php
+```js
 var pg = require('pg-promise')();
 var SQL = require('sql-dialect');
 
@@ -118,7 +118,7 @@ For a developper this notation is pretty intuitive since it's very similar to ho
 
 So to be able to build complex queries without being limitated by the API, this library allows prefix notation like in the following:
 
-```php
+```js
 select.fields({ '*': [
   { '+': [1, 2] }, 3
 ] });
@@ -153,7 +153,7 @@ So, to be able to choose the formatting, the following formatters has been intro
 
 Since most of queries relies on the following kind of condition: `field = value`, you don't need to specify the formatting everywhere. For example you can simply write your select conditions like the following:
 
-```php
+```js
 select.from('table').where([
   { field1: 'value1' },
   { field2: 'value2' }
@@ -164,7 +164,7 @@ echo select.toString();
 
 which can be rewrited as:
 
-```php
+```js
 select.from('table').where([
   { field: { ':value': 'value' }
 ]);
@@ -172,7 +172,7 @@ select.from('table').where([
 
 which can also be rewrited as:
 
-```php
+```js
 select.from('table').where([
     { '=': [{ ':name': 'field' }, { ':value': 'value' }] }
 ]);
@@ -180,7 +180,7 @@ select.from('table').where([
 
 So most of the time the `{ field: 'value' }` syntax will fit prefectly well to your need. However if you wan't to make a `field1 = field2` condition where both part must be escaped, the prefix notation can save your day:
 
-```php
+```js
 select.from('table').where([
   { field1: { ':name': 'field2' }
 ]);
@@ -278,7 +278,7 @@ It's also possible to create your own operators with handlers to build them.
 
 Example:
 
-```php
+```js
 var dialect = new SQL.PostgreSql({
   builders: {
     braces: function ($operator, $parts) {
@@ -304,7 +304,7 @@ To use a subquery inside another query or doing some algebraic operations on que
 
 Example of `JOIN` on a subquery:
 
-```php
+```js
 var subquery = dialect.statement('select')
 subquery.from('table2').alias('t2');
 
@@ -316,7 +316,7 @@ echo select.toString();
 
 Example of `UNION` query:
 
-```php
+```js
 var select1 = dialect.statement('select').from('table1');
 var select2 = dialect.statement('select').from('table2');
 
@@ -330,7 +330,7 @@ echo dialect.conditions([
 
 Example of `INSERT` query:
 
-```php
+```js
 var insert = dialect.statement('insert');
 
 insert.into('table')               // INTO
@@ -346,7 +346,7 @@ The `values()` method allows you to pass an array of key-value pairs where the k
 
 Example of `UPDATE` query:
 
-```php
+```js
 var update = dialect.statement('update');
 
 $update.table('table')              // TABLE
@@ -363,7 +363,7 @@ The `values()` method allows you to pass an array of key-value pairs where the k
 
 Example of `DELETE` query:
 
-```php
+```js
 var delete = dialect.statement('delete');
 
 delete.from('table')                 // FROM
@@ -374,7 +374,7 @@ delete.from('table')                 // FROM
 
 Example of `CREATE TABLE` query:
 
-```php
+```js
 var createTable = dialect.statement('create table');
 createTable
     .table('table')                 // TABLE
@@ -385,7 +385,7 @@ createTable
 
 Bellow an example of a MySQL table creation:
 
-```php
+```js
 var createTable = dialect.statement('create table');
 createTable
     .table('table')
@@ -472,7 +472,7 @@ Databases uses different naming conventions for types which can be missleading. 
 
 For example with MySQL the `'serial'` type will generate the following query:
 
-```php
+```js
 var createTable = dialect.statement('create table');
 createTable.table('table')
            .columns([
@@ -485,7 +485,7 @@ echo this.create.toString();
 
 And PostgreSQL will generate:
 
-```php
+```js
 var createTable = dialect.statement('create table');
 createTable.table('table')
            .columns([
@@ -498,14 +498,14 @@ echo this.create.toString();
 
 However it's possible to add your own abstract types. For example to make `'uuid'` to stand for `char(30)` columns, we can write:
 
-```php
+```js
 var dialect = new SQL.MySql();
 dialect.type('uuid', { use: 'char', length: 30 });
 ```
 
 If you don't want to deal with abstract types you can use directly `'use'` instead of `'type'` to define a column:
 
-```php
+```js
 var createTable = dialect.statement('create table');
 createTable.table('table')
            .columns([
@@ -519,7 +519,7 @@ createTable.table('table')
 When you are using abstract types, it would be interesting to be able to map databases type to their corresponding abstract type.
 
 Example:
-```php
+```js
 dialect.map('tinyint', 'boolean', { length: 1 });
 dialect.map('tinyint', 'integer');
 
@@ -536,7 +536,7 @@ Note: for databases like SQLite this won't help much since types are not discrim
 
 Example of `DROP TABLE` query:
 
-```php
+```js
 var dropTable = dialect.statement('drop table');
 
 dropTable.table('table');         // TABLE
