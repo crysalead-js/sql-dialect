@@ -84,7 +84,7 @@ class Sqlite extends Dialect {
     this.map('blob',      'binary');
     this.map('date',      'date');
     this.map('integer',   'integer');
-    this.map('numeric',   'decimal', { precision: 2 });
+    this.map('decimal',   'decimal', { precision: 2 });
     this.map('real',      'float');
     this.map('text',      'text');
     this.map('time',      'time');

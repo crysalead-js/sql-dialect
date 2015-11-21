@@ -303,14 +303,16 @@ class Dialect {
       options = {};
     }
 
-    if (this._maps[use] === undefined) {
-      throw new Error("No type matching has been defined for `'" + use + "'`.");
+    var map = this._maps[use];
+
+    if (map === undefined) {
+      return 'string';
     }
 
     var result, cpt, max = 0;
 
-    for (var type in this._maps[use]) {
-      var value = this._maps[use][type];
+    for (var type in map) {
+      var value = map[type];
       cpt = 0;
       for (var key in value) {
         cpt = value[key] === options[key] ? cpt + 1 : cpt - 1;
@@ -320,11 +322,10 @@ class Dialect {
         max = cpt;
       }
     }
-
     if (result) {
       return result;
     }
-    throw new Error("No type matching has been defined for `'" + use + "'`.");
+    return 'string';
   }
 
   /**

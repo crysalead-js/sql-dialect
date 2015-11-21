@@ -501,7 +501,7 @@ describe("Dialect", function() {
 
   });
 
-  describe(".map()", function() {
+  describe(".map/mapped()", function() {
 
     it("gets/sets type matching", function() {
 
@@ -539,27 +539,18 @@ describe("Dialect", function() {
 
     });
 
-    it("throws an exception when options can't many any type", function() {
+    it("returns the default type when options can't match an existing type options", function() {
 
       this.dialect.map('tinyint', 'boolean', { length: 1 });
-
-      var closure = function() {
-        this.dialect.mapped({ use: 'tinyint', length: 3 });
-      }.bind(this);
-      expect(closure).toThrow(new Error("No type matching has been defined for `'tinyint'`."));
+      this.dialect.map('_default_', 'string');
+      expect(this.dialect.mapped({ use: 'tinyint', length: 3 })).toBe('string');
 
     });
 
-  });
+    it("returns the default type for unexisting types", function() {
 
-  describe(".mapped()", function() {
-
-    it("throws an exception if there's no type matching defined", function() {
-
-      var closure = function() {
-        this.dialect.mapped('real');
-      }.bind(this);
-      expect(closure).toThrow(new Error("No type matching has been defined for `'real'`."));
+      this.dialect.map('_default_', 'string');
+      expect(this.dialect.mapped('real')).toBe('string');
 
     });
 
