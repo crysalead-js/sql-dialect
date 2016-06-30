@@ -310,6 +310,33 @@ describe("Dialect", function() {
 
     });
 
+    it("generates IS expression", function() {
+
+      var part = this.dialect.conditions({
+        ':is': [ {':name': 'score'}, null ]
+      });
+      expect(part).toBe('"score" IS NULL');
+
+    });
+
+    it("generates a IS expression using the short syntax", function() {
+
+      var part = this.dialect.conditions({
+        'score': null
+      });
+      expect(part).toBe('"score" IS NULL');
+
+    });
+
+    it("generates IS NOT expression", function() {
+
+      var part = this.dialect.conditions({
+        ':is not': [ {':name': 'score'}, null ]
+      });
+      expect(part).toBe('"score" IS NOT NULL');
+
+    });
+
     it("generates a IN expression using the short syntax", function() {
 
       var part = this.dialect.conditions({
@@ -542,14 +569,12 @@ describe("Dialect", function() {
     it("returns the default type when options can't match an existing type options", function() {
 
       this.dialect.map('tinyint', 'boolean', { length: 1 });
-      this.dialect.map('_default_', 'string');
       expect(this.dialect.mapped({ use: 'tinyint', length: 3 })).toBe('string');
 
     });
 
     it("returns the default type for unexisting types", function() {
 
-      this.dialect.map('_default_', 'string');
       expect(this.dialect.mapped('real')).toBe('string');
 
     });

@@ -547,8 +547,8 @@ class Dialect {
     var conditions = Array.isArray(conditions) ? conditions : [conditions];
     var parts = this._conditions(conditions, states);
 
-    //var operator = (is_array(parts) && next(parts) === null && isset(config['null'])) ? config['null'] : operator;
-    var operator = operator.charAt(0) === ':' ? operator.substr(1).toUpperCase() : operator;
+    var operator = (parts[1] === 'NULL' && config.null) ? config.null : operator;
+    operator = operator.charAt(0) === ':' ? operator.substr(1).toUpperCase() : operator;
     if (config.builder === undefined) {
       return parts.join(' ' + operator + ' ');
     }
@@ -582,7 +582,7 @@ class Dialect {
       if (Array.isArray(value)) {
         parts = parts.concat(this._conditions(value, states));
       } else {
-        if (value.constructor !== Object) {
+        if (!value || value.constructor !== Object) {
           parts.push(this.value(value, states));
         } else {
           var name = Object.keys(value)[0];
@@ -616,7 +616,7 @@ class Dialect {
     states.schema = schema;
 
     if (!value || value.constructor !== Object && value.constructor !== Array) {
-      return escaped + ' = ' + this.value(value, states);
+      return this._operator('=', [ {':name': name}, value ], states);
     }
 
     var key = Object.keys(value)[0];
@@ -737,6 +737,8 @@ class Dialect {
       return caster(value, states);
     }
     switch (true) {
+      case value === null:
+        return 'NULL';
       case typeof value === 'boolean':
         return value ? 'TRUE' : 'FALSE';
       case typeof value === 'string':
