@@ -752,12 +752,11 @@ class Dialect {
             if (Array.isArray(v)) {
               result.push(cast(v));
             } else {
-              result.push(v);
+              result.push(this.value(v, states));
             }
           }
           return '{' + result.join(',') + '}';
-
-        };
+        }.bind(this);
         return cast(value);
     }
     return String(value);

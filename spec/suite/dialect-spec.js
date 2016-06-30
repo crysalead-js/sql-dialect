@@ -56,6 +56,16 @@ describe("Dialect", function() {
 
     });
 
+    it("is called when defined to cast values", function(done) {
+
+      var caster = function() {
+        done();
+      };
+      this.dialect.caster(caster);
+      this.dialect.value('Hello World');
+
+    });
+
   });
 
   describe(".names()", function() {
@@ -213,6 +223,36 @@ describe("Dialect", function() {
         expect(part).toBe('"prefix".*');
 
       });
+
+    });
+
+  });
+
+  describe(".value()", function() {
+
+    it("casts values", function() {
+
+      expect(this.dialect.value(null)).toBe('NULL');
+      expect(this.dialect.value(true)).toBe('TRUE');
+      expect(this.dialect.value(false)).toBe('FALSE');
+      expect(this.dialect.value('text')).toBe("'text'")
+      expect(this.dialect.value([null, 'text', true])).toBe("{NULL,'text',TRUE}");
+      expect(this.dialect.value(Number(15.85))).toBe('15.85');
+
+    });
+
+    it("assures the custom casting handler is correctly called if set", function() {
+
+      var getType = function(field){};
+
+      var caster = function(value, states) {
+        expect(states.name).toBe('field');
+        expect(value).toBe('value');
+        return 'casted';
+      };
+      this.dialect.caster(caster);
+
+      expect(this.dialect.value('value', { name: 'field' })).toBe('casted');
 
     });
 
