@@ -13,6 +13,13 @@ class Update extends Statement {
     super(config);
 
     /**
+     * The type detector callable.
+     *
+     * @var callable
+     */
+    this._type = null;
+
+    /**
      * The SQL parts.
      *
      * @var Object
@@ -43,11 +50,13 @@ class Update extends Statement {
   /**
    * Sets the `UPDATE` values.
    *
-   * @param  Object   values The record values to insert.
-   * @return Function        Returns `this`.
+   * @param  Object   values   The record values to insert.
+   * @param  Function callable The type detector handler.
+   * @return Function          Returns `this`.
    */
-  values(values) {
+  values(values, callable) {
     this._parts.values = values;
+    this._type = callable;
     return this;
   }
 
@@ -83,7 +92,11 @@ class Update extends Statement {
   _buildSet() {
     var values = [];
     for (var key in this._parts.values) {
-      values.push(this.dialect().name(key) + ' = ' + this.dialect().value(this._parts.values[key]));
+      var states = { name: key };
+      if (this._type) {
+        states.type = this._type;
+      }
+      values.push(this.dialect().name(key) + ' = ' + this.dialect().value(this._parts.values[key], states));
     }
     return values.length ? ' SET ' + values.join(', ') : '';
   }

@@ -732,7 +732,7 @@ class Dialect {
    * @return mixed         The formatted value.
    */
   value(value, states) {
-    var caster = this.caster()
+    var caster = this.caster();
     if (caster) {
       return caster(value, states);
     }

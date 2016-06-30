@@ -13,6 +13,13 @@ class Insert extends Statement {
     super(config);
 
     /**
+     * The type detector callable.
+     *
+     * @var callable
+     */
+    this._type = null;
+
+    /**
      * The SQL parts.
      *
      * @var Object
@@ -39,13 +46,16 @@ class Insert extends Statement {
   /**
    * Sets the `INSERT` values.
    *
-   * @param  Object   values The record values to insert.
-   * @return Function        Returns `this`.
+   * @param  Object   values   The record values to insert.
+   * @param  Function callable The type detector handler.
+   * @return Function          Returns `this`.
    */
-  values(values) {
+  values(values, callable) {
     this._parts.values = values;
+    this._type = callable;
     return this;
   }
+
 
   /**
    * Render the SQL statement
@@ -57,20 +67,31 @@ class Insert extends Statement {
       throw new Error("Invalid `INSERT` statement, missing `INTO` clause.");
     }
 
-    var fields = Object.keys(this._parts.values);
-    var values = [];
-    for (var i = 0, len = fields.length; i < len; i++) {
-      values.push(this.dialect().value(this._parts.values[fields[i]]));
-    }
-
     return 'INSERT' +
       this._buildFlags(this._parts.flags) +
       this._buildClause('INTO', this.dialect().name(this._parts.into, true)) +
-      this._buildChunk('(' + this.dialect().names(fields, true) + ')', false) +
-      this._buildChunk('VALUES (' + values.join(', ') + ')') +
+      this._buildChunk('(' + this.dialect().names(Object.keys(this._parts.values), true) + ')', false) +
+      this._buildValues() +
       this._buildClause('RETURNING', this.dialect().names(this._parts.returning, false, ''));
   }
 
+  /**
+    * Build `VALUES` clause.
+    *
+    * @return String Returns the `VALUES` clause.
+    */
+  _buildValues() {
+    var values = [];
+
+    for (var key in this._parts.values) {
+      var states = { name: key };
+      if (this._type) {
+        states.type = this._type;
+      }
+      values.push(this.dialect().value(this._parts.values[key], states));
+    }
+    return ' VALUES (' + values.join(', ') + ')';
+  }
 }
 
 export default Insert;
