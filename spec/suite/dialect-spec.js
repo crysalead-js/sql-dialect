@@ -56,13 +56,13 @@ describe("Dialect", function() {
 
     });
 
-    it("is called when defined to cast values", function(done) {
+    it("is called when defined to cast values", function() {
 
       var caster = function() {
-        done();
+        return 'casted';
       };
       this.dialect.caster(caster);
-      this.dialect.value('Hello World');
+      expect(this.dialect.value('Hello World')).toBe('casted');
 
     });
 
@@ -235,7 +235,7 @@ describe("Dialect", function() {
       expect(this.dialect.value(null)).toBe('NULL');
       expect(this.dialect.value(true)).toBe('TRUE');
       expect(this.dialect.value(false)).toBe('FALSE');
-      expect(this.dialect.value('text')).toBe("'text'")
+      expect(this.dialect.value('text')).toBe("'text'");
       expect(this.dialect.value([null, 'text', true])).toBe("{NULL,'text',TRUE}");
       expect(this.dialect.value(Number(15.85))).toBe('15.85');
 
