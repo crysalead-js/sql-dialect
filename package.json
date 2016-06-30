@@ -25,13 +25,13 @@
   "main": "lib/index.js",
   "jsnext:main": "src/index.js",
   "devDependencies": {
-    "babel-cli": "^6.1.18",
-    "babel-core": "^6.1.21",
+    "babel-cli": "^6.10.1",
+    "babel-core": "^6.10.4",
     "babel-preset-es2015": "^6.9.0",
-    "chai-kahlan": "^1.0.2",
-    "coveralls": "^2.11.4",
+    "chai-kahlan": "^1.0.4",
+    "coveralls": "^2.11.9",
     "isparta": "^4.0.0",
-    "jasmine-kahlan": "^1.0.1",
-    "mocha": "^2.3.4"
+    "jasmine-kahlan": "^1.0.2",
+    "mocha": "^2.5.3"
   }
 }
