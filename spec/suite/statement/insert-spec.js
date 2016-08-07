@@ -34,6 +34,19 @@ describe("Insert", function() {
 
   describe(".values()", function() {
 
+    it("inserts in batch", function() {
+
+      this.insert.into('table').values({
+        field1: 'value1',
+        field2: 'value2'
+      }).values({
+        field1: 'value3',
+        field2: 'value4'
+      });
+      expect(this.insert.toString()).toBe('INSERT INTO "table" ("field1", "field2") VALUES (\'value1\', \'value2\'), (\'value3\', \'value4\')');
+
+    });
+
     it("assures the custom casting handler is correctly called if set", function() {
 
       var getType = function(field){};

@@ -27,7 +27,7 @@ class Insert extends Statement {
     this._parts = {
       flags     : new Map(),
       into      : '',
-      values    : {},
+      values    : [],
       returning : []
     }
   }
@@ -51,7 +51,7 @@ class Insert extends Statement {
    * @return Function          Returns `this`.
    */
   values(values, callable) {
-    this._parts.values = values;
+    this._parts.values.push(values);
     this._type = callable;
     return this;
   }
@@ -67,10 +67,12 @@ class Insert extends Statement {
       throw new Error("Invalid `INSERT` statement, missing `INTO` clause.");
     }
 
+    var fields = this._parts.values.length ? Object.keys(this._parts.values[0]) : [];
+
     return 'INSERT' +
       this._buildFlags(this._parts.flags) +
       this._buildClause('INTO', this.dialect().name(this._parts.into, true)) +
-      this._buildChunk('(' + this.dialect().names(Object.keys(this._parts.values), true) + ')', false) +
+      this._buildChunk('(' + this.dialect().names(fields, true) + ')', false) +
       this._buildValues() +
       this._buildClause('RETURNING', this.dialect().names(this._parts.returning, false, ''));
   }
@@ -81,16 +83,20 @@ class Insert extends Statement {
     * @return String Returns the `VALUES` clause.
     */
   _buildValues() {
-    var values = [];
+    var parts = [];
 
-    for (var key in this._parts.values) {
-      var states = { name: key };
-      if (this._type) {
-        states.type = this._type;
+    for (var values of this._parts.values) {
+      var data = [];
+      for (var key in values) {
+        var states = { name: key };
+        if (this._type) {
+          states.type = this._type;
+        }
+        data.push(this.dialect().value(values[key], states));
       }
-      values.push(this.dialect().value(this._parts.values[key], states));
+      parts.push('(' + data.join(', ') + ')');
     }
-    return ' VALUES (' + values.join(', ') + ')';
+    return ' VALUES ' + parts.join(', ');
   }
 }
 
