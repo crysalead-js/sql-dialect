@@ -1,4 +1,4 @@
-import { Statement } from '../../src';
+var Statement = require('../../src/statement');
 
 describe("Statement", function() {
 

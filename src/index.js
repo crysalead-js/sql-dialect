@@ -1,7 +1,13 @@
-import Statement from './statement';
-import Dialect from './dialect';
-import MySql from './dialect/my-sql';
-import PostgreSql from './dialect/postgre-sql';
-import Sqlite from './dialect/sqlite';
+var Statement = require('./statement');
+var Dialect = require('./dialect');
+var MySql = require('./dialect/my-sql');
+var PostgreSql = require('./dialect/postgre-sql');
+var Sqlite = require('./dialect/sqlite');
 
-export { Statement, Dialect, MySql, PostgreSql, Sqlite };
+module.exports = {
+  Statement: Statement,
+  Dialect: Dialect,
+  MySql: MySql,
+  PostgreSql: PostgreSql,
+  Sqlite: Sqlite
+};

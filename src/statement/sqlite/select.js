@@ -1,4 +1,4 @@
-import BaseSelect from '../select';
+var BaseSelect = require('../select');
 
 /**
  * `SELECT` statement.
@@ -6,4 +6,4 @@ import BaseSelect from '../select';
 class Select extends BaseSelect {
 }
 
-export default Select;
+module.exports = Select;

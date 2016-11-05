@@ -1,5 +1,6 @@
-import {extend, merge} from 'extend-merge';
-import Statement from '../statement';
+var extend = require('extend-merge').extend;
+var merge = require('extend-merge').merge;
+var Statement = require('../statement');
 
 /**
  * `CREATE TABLE` statement.
@@ -190,4 +191,4 @@ class CreateTable extends Statement {
 
 }
 
-export default CreateTable;
+module.exports = CreateTable;

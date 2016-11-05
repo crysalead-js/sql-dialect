@@ -1,4 +1,4 @@
-import Statement from '../statement';
+var Statement = require('../statement');
 
 /**
  * `SELECT` statement.
@@ -229,4 +229,4 @@ class Select extends Statement {
 
 }
 
-export default Select;
+module.exports = Select;

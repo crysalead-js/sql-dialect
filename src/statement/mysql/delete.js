@@ -1,4 +1,4 @@
-import BaseDelete from '../delete';
+var BaseDelete = require('../delete');
 
 /**
  * `DELETE` statement.
@@ -39,4 +39,4 @@ class Delete extends BaseDelete {
   }
 }
 
-export default Delete;
+module.exports = Delete;

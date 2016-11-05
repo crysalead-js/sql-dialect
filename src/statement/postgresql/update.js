@@ -1,4 +1,4 @@
-import BaseUpdate from '../update';
+var BaseUpdate = require('../update');
 
 /**
  * `UPDATE` statement.
@@ -19,4 +19,4 @@ class Update extends BaseUpdate {
   }
 }
 
-export default Update;
+module.exports = Update;

@@ -1,4 +1,4 @@
-import { MySql } from '../../../../src';
+var MySql = require('../../../../src/dialect/my-sql');
 
 describe("MySql Delete", function() {
 

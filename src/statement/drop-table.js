@@ -1,4 +1,4 @@
-import Statement from '../statement';
+var Statement = require('../statement');
 
 /**
  * `DROP TABLE` statement.
@@ -88,4 +88,4 @@ class DropTable extends Statement {
   }
 }
 
-export default DropTable;
+module.exports = DropTable;

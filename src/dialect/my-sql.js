@@ -1,12 +1,13 @@
-import {extend, merge} from 'extend-merge';
+var extend = require('extend-merge').extend;
+var merge = require('extend-merge').merge;
 
-import Dialect from '../dialect';
-import Select from '../statement/mysql/select';
-import Insert from '../statement/mysql/insert';
-import Update from '../statement/mysql/update';
-import Delete from '../statement/mysql/delete';
-import CreateTable from '../statement/create-table';
-import DropTable from '../statement/drop-table';
+var Dialect = require('../dialect');
+var Select = require('../statement/mysql/select');
+var Insert = require('../statement/mysql/insert');
+var Update = require('../statement/mysql/update');
+var Delete = require('../statement/mysql/delete');
+var CreateTable = require('../statement/create-table');
+var DropTable = require('../statement/drop-table');
 
 /**
  * MySQL dialect.
@@ -193,4 +194,4 @@ MySql._classes = {
   'drop table'  : DropTable
 };
 
-export default MySql;
+module.exports = MySql;

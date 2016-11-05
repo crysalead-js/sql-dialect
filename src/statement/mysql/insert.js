@@ -1,4 +1,4 @@
-import BaseInsert from '../insert';
+var BaseInsert = require('../insert');
 
 /**
  * `INSERT` statement.
@@ -50,4 +50,4 @@ class Insert extends BaseInsert {
 
 }
 
-export default Insert;
+module.exports = Insert;

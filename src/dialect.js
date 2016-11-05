@@ -1,12 +1,13 @@
-import {extend, merge} from 'extend-merge';
-import string from 'string-placeholder';
+var extend = require('extend-merge').extend;
+var merge = require('extend-merge').merge;
+var string = require('string-placeholder');
 
-import Select from './statement/select';
-import Insert from './statement/insert';
-import Update from './statement/update';
-import Delete from './statement/delete';
-import CreateTable from './statement/create-table';
-import DropTable from './statement/drop-table';
+var Select = require('./statement/select');
+var Insert = require('./statement/insert');
+var Update = require('./statement/update');
+var Delete = require('./statement/delete');
+var CreateTable = require('./statement/create-table');
+var DropTable = require('./statement/drop-table');
 
 /**
  * ANSI SQL dialect
@@ -925,4 +926,4 @@ Dialect._classes = {
   'drop table'  : DropTable
 };
 
-export default Dialect;
+module.exports = Dialect;

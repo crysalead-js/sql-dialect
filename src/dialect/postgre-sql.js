@@ -1,12 +1,13 @@
-import {extend, merge} from 'extend-merge';
+var extend = require('extend-merge').extend;
+var merge = require('extend-merge').merge;
 
-import Dialect from '../dialect';
-import Select from '../statement/postgresql/select';
-import Insert from '../statement/postgresql/insert';
-import Update from '../statement/postgresql/update';
-import Delete from '../statement/postgresql/delete';
-import CreateTable from '../statement/create-table';
-import DropTable from '../statement/drop-table';
+var Dialect = require('../dialect');
+var Select = require('../statement/postgresql/select');
+var Insert = require('../statement/postgresql/insert');
+var Update = require('../statement/postgresql/update');
+var Delete = require('../statement/postgresql/delete');
+var CreateTable = require('../statement/create-table');
+var DropTable = require('../statement/drop-table');
 
 /**
  * PostgreSQL dialect.
@@ -203,4 +204,4 @@ PostgreSql._classes = {
   'drop table'  : DropTable
 };
 
-export default PostgreSql;
+module.exports = PostgreSql;

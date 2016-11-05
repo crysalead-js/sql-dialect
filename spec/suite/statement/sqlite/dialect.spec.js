@@ -1,4 +1,4 @@
-import { Sqlite } from '../../../../src';
+var Sqlite = require('../../../../src/dialect/sqlite');
 
 describe("Sqlite Dialect", function() {
 

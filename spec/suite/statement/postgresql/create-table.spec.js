@@ -1,4 +1,4 @@
-import { PostgreSql } from '../../../../src';
+var PostgreSql = require('../../../../src/dialect/postgre-sql');
 
 describe("PostgreSql CreateTable", function() {
 

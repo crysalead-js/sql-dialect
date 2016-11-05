@@ -1,12 +1,13 @@
-import {extend, merge} from 'extend-merge';
+var extend = require('extend-merge').extend;
+var merge = require('extend-merge').merge;
 
-import Dialect from '../dialect';
-import Select from '../statement/sqlite/select';
-import Insert from '../statement/sqlite/insert';
-import Update from '../statement/sqlite/update';
-import Delete from '../statement/sqlite/delete';
-import CreateTable from '../statement/create-table';
-import DropTable from '../statement/drop-table';
+var Dialect = require('../dialect');
+var Select = require('../statement/sqlite/select');
+var Insert = require('../statement/sqlite/insert');
+var Update = require('../statement/sqlite/update');
+var Delete = require('../statement/sqlite/delete');
+var CreateTable = require('../statement/create-table');
+var DropTable = require('../statement/drop-table');
 
 /**
  * Sqlite dialect.
@@ -155,4 +156,4 @@ Sqlite._classes = {
   'drop table'  : DropTable
 };
 
-export default Sqlite;
+module.exports = Sqlite;

@@ -1,4 +1,4 @@
-import Statement from '../statement';
+var Statement = require('../statement');
 
 /**
  * `DELETE` statement.
@@ -59,4 +59,4 @@ class Delete extends Statement {
 
 }
 
-export default Delete;
+module.exports = Delete;

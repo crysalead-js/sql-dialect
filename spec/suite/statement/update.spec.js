@@ -1,4 +1,4 @@
-import { Dialect } from '../../../src';
+var Dialect = require('../../../src/dialect');
 
 describe("Update", function() {
 

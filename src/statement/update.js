@@ -1,4 +1,4 @@
-import Statement from '../statement';
+var Statement = require('../statement');
 
 /**
  * `UPDATE` statement.
@@ -102,4 +102,4 @@ class Update extends Statement {
   }
 }
 
-export default Update;
+module.exports = Update;

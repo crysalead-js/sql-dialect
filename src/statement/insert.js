@@ -1,4 +1,4 @@
-import Statement from '../statement';
+var Statement = require('../statement');
 
 /**
  * INSERT statement.
@@ -100,4 +100,4 @@ class Insert extends Statement {
   }
 }
 
-export default Insert;
+module.exports = Insert;
