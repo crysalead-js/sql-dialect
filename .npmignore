@@ -2,4 +2,4 @@ coverage/
 node_modules/
 spec/
 test/
-
+.nyc_output
