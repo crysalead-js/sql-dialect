@@ -216,7 +216,13 @@ class Dialect {
   _defaultFormatters() {
     return {
       ':name': function (value, states) {
-        return this.name(value);
+        states = states || {};
+        var [alias, field] = this.undot(value);
+        var escaped = this.name(value);
+        var schema = states && states.schemas && states.schemas[alias] ? states.schemas[alias] : null;
+        states.name = field;
+        states.schema = schema;
+        return escaped;
       }.bind(this),
       ':value': function (value, states) {
         return this.value(value, states);

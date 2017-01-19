@@ -1,3 +1,4 @@
+var extend = require('extend-merge').extend;
 var Dialect = require('../../src/dialect');
 
 describe("Dialect", function() {
@@ -451,6 +452,51 @@ describe("Dialect", function() {
 
       part = this.dialect.conditions({'()': [1, 2]});
       expect(part).toBe('(1, 2)');
+
+    });
+
+    it("applies casting strategy with correct params", function() {
+
+      var logs = [];
+
+      var defaultSchema = function(){};
+      var table1Schema = function(){};
+      var table2Schema = function(){};
+
+      var caster = function(value, states) {
+        logs.push(extend({}, states));
+        return value;
+      };
+
+      this.dialect.caster(caster);
+
+      var result = this.dialect.conditions([
+        {'!=': [
+          {':name': 'value' }, 789
+        ]},
+        {':or': [
+          {'<': [
+            {':name': 'Table1.min' }, 123
+          ]},
+          {'>': [
+            {':name': 'Table2.max' }, 456
+          ]}
+        ]},
+        {'!=': [
+          {':name': 'value' }, 0
+        ]}
+      ], { schemas: {
+        '': defaultSchema,
+        'Table1': table1Schema,
+        'Table2': table2Schema
+      }});
+      expect(result).toBe('"value" != 789 AND "Table1"."min" < 123 OR "Table2"."max" > 456 AND "value" != 0');
+
+      expect(logs.length).toBe(4);
+      expect(logs[0].schema).toBe(defaultSchema);
+      expect(logs[1].schema).toBe(table1Schema);
+      expect(logs[2].schema).toBe(table2Schema);
+      expect(logs[0].schema).toBe(defaultSchema);
 
     });
 
