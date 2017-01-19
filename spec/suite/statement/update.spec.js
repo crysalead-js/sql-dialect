@@ -51,14 +51,36 @@ describe("Update", function() {
 
       var caster = function(value, states) {
         expect(states.name).toBe('field');
-        expect(states.type).toBe(getType);
+        expect(states.schema).toBe(getType);
         expect(value).toBe('value');
         return "'casted'";
       };
       this.dialect.caster(caster);
-      this.update.table('table').values({ field: 'value' }, getType);
+      var update = this.dialect.statement('update', { schema: getType });
+      update.table('table').values({ field: 'value' });
 
-      expect(this.update.toString()).toBe('UPDATE "table" SET "field" = \'casted\'');
+      expect(update.toString()).toBe('UPDATE "table" SET "field" = \'casted\'');
+
+    });
+
+    it("assures the custom casting handler is correctly called if set", function() {
+
+      var getType = function(field) {
+        if (field === 'field') {
+          return 'fieldType';
+        }
+      };
+
+      var caster = function(value, states) {
+        var type = states.schema(states.name);
+        return type === 'fieldType' ? "'casted'" : value;
+      };
+
+      this.dialect.caster(caster);
+      var update = this.dialect.statement('update', { schema: getType });
+      update.table('table').values({ field: 'value' }).where({ field: 'value' });
+
+      expect(update.toString()).toBe('UPDATE "table" SET "field" = \'casted\' WHERE "field" = \'casted\'');
 
     });
 

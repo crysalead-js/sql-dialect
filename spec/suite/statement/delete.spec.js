@@ -36,6 +36,27 @@ describe("Delete", function() {
 
     });
 
+    it("assures the custom casting handler is correctly called if set", function() {
+
+      var getType = function(field) {
+        if (field === 'field') {
+          return 'fieldType';
+        }
+      };
+
+      var caster = function(value, states) {
+        var type = states.schema(states.name);
+        return type === 'fieldType' ? "'casted'" : value;
+      };
+
+      this.dialect.caster(caster);
+      var del = this.dialect.statement('delete', { schema: getType });
+      del.from('table').where({ field: 'value' });
+
+      expect(del.toString()).toBe('DELETE FROM "table" WHERE "field" = \'casted\'');
+
+    });
+
   });
 
   describe(".order()", function() {

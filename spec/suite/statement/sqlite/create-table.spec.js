@@ -131,10 +131,11 @@ describe("Sqlite CreateTable", function() {
         }
 
         dialect.caster(function(value, states) {
-          var type = states && states.type ? states.type : gettype(value);
-          if (typeof type === 'function') {
-            type = type(states.name);
+          var type;
+          if (states && states.schema) {
+            type = states.schema.type(states.name);
           }
+          type = type ? type : gettype(value);
           switch (type) {
             case 'integer':
               return Number.parseInt(value);

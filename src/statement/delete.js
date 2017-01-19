@@ -1,9 +1,12 @@
+var extend = require('extend-merge').extend;
 var Statement = require('../statement');
 
 /**
  * `DELETE` statement.
  */
 class Delete extends Statement {
+
+
   /**
    * Constructor.
    *
@@ -11,6 +14,18 @@ class Delete extends Statement {
    */
   constructor(config) {
     super(config);
+
+    var defaults = {
+      schema: null
+    };
+    config = extend({}, defaults, config);
+
+    /**
+     * The schema.
+     *
+     * @var mixed
+     */
+    this._schema = config.schema;
 
     /**
      * The SQL parts.
@@ -51,7 +66,9 @@ class Delete extends Statement {
     return 'DELETE' +
       this._buildFlags(this._parts.flags) +
       this._buildClause('FROM', this.dialect().names(this._parts.from)) +
-      this._buildClause('WHERE',  this.dialect().conditions(this._parts.where)) +
+      this._buildClause('WHERE',  this.dialect().conditions(this._parts.where, {
+        schemas: { '': this._schema }
+      })) +
       this._buildOrder() +
       this._buildClause('LIMIT', this._parts.limit) +
       this._buildClause('RETURNING', this.dialect().names(this._parts.returning));

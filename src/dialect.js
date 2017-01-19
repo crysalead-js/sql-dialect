@@ -688,7 +688,7 @@ class Dialect {
         return [field.substr(0, pos), field.substr(pos + 1)];
       }
     }
-    return [null, field];
+    return ['', field];
   }
 
   /**

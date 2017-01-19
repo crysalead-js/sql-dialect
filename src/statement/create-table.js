@@ -171,7 +171,7 @@ class CreateTable extends Statement {
         throw new Error("Missing contraint type.");
       }
       var meta, type = constraint.type;
-      if (meta = this.dialect().constraint(type, constraint, { type: this.type.bind(this) })) {
+      if (meta = this.dialect().constraint(type, constraint, { schemas: {'': this } })) {
         result.push(meta);
       }
       if (type === 'primary') {

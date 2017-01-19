@@ -173,16 +173,17 @@ class Select extends Statement {
    *
    * @return String The generated SQL string.
    */
-  toString() {
+  toString(schemas) {
+    schemas = schemas || [];
     var fields = this.dialect().names(this._parts.fields);
     var sql = 'SELECT' +
       this._buildFlags(this._parts.flags) +
       this._buildChunk(fields ? fields : '*') +
       this._buildClause('FROM', this.dialect().names(this._parts.from)) +
       this._buildJoins() +
-      this._buildClause('WHERE', this.dialect().conditions(this._parts.where)) +
+      this._buildClause('WHERE', this.dialect().conditions(this._parts.where, { schemas: schemas })) +
       this._buildClause('GROUP BY', this._buildGroup()) +
-      this._buildClause('HAVING', this.dialect().conditions(this._parts.having)) +
+      this._buildClause('HAVING', this.dialect().conditions(this._parts.having, { schemas: schemas })) +
       this._buildOrder() +
       this._buildClause('LIMIT', this._parts.limit) +
       this._buildFlag('FOR UPDATE', this._parts.forUpdate);

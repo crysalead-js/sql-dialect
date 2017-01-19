@@ -1,3 +1,4 @@
+var extend = require('extend-merge').extend;
 var Statement = require('../statement');
 
 /**
@@ -12,12 +13,17 @@ class Insert extends Statement {
   constructor(config) {
     super(config);
 
+    var defaults = {
+      schema: null
+    };
+    config = extend({}, defaults, config);
+
     /**
-     * The type detector callable.
+     * The schema.
      *
-     * @var callable
+     * @var mixed
      */
-    this._type = null;
+    this._schema = config.schema;
 
     /**
      * The SQL parts.
@@ -47,12 +53,10 @@ class Insert extends Statement {
    * Sets the `INSERT` values.
    *
    * @param  Object   values   The record values to insert.
-   * @param  Function callable The type detector handler.
    * @return Function          Returns `this`.
    */
-  values(values, callable) {
+  values(values) {
     this._parts.values.push(values);
-    this._type = callable;
     return this;
   }
 
@@ -89,8 +93,8 @@ class Insert extends Statement {
       var data = [];
       for (var key in values) {
         var states = { name: key };
-        if (this._type) {
-          states.type = this._type;
+        if (this._schema) {
+          states.schema = this._schema;
         }
         data.push(this.dialect().value(values[key], states));
       }

@@ -1,3 +1,4 @@
+var extend = require('extend-merge').extend;
 var Statement = require('../statement');
 
 /**
@@ -12,12 +13,17 @@ class Update extends Statement {
   constructor(config) {
     super(config);
 
+    var defaults = {
+      schema: null
+    };
+    config = extend({}, defaults, config);
+
     /**
-     * The type detector callable.
+     * The schema.
      *
-     * @var callable
+     * @var mixed
      */
-    this._type = null;
+    this._schema = config.schema;
 
     /**
      * The SQL parts.
@@ -51,12 +57,10 @@ class Update extends Statement {
    * Sets the `UPDATE` values.
    *
    * @param  Object   values   The record values to insert.
-   * @param  Function callable The type detector handler.
    * @return Function          Returns `this`.
    */
-  values(values, callable) {
+  values(values) {
     this._parts.values = values;
-    this._type = callable;
     return this;
   }
 
@@ -78,7 +82,9 @@ class Update extends Statement {
       this._buildFlags(this._parts.flags) +
       this._buildChunk(this.dialect().names(this._parts.table)) +
       this._buildSet() +
-      this._buildClause('WHERE',  this.dialect().conditions(this._parts.where)) +
+      this._buildClause('WHERE',  this.dialect().conditions(this._parts.where, { schemas: {
+        '': this._schema
+      }})) +
       this._buildOrder() +
       this._buildClause('LIMIT', this._parts.limit) +
       this._buildClause('RETURNING', this.dialect().names(this._parts.returning));
@@ -93,8 +99,8 @@ class Update extends Statement {
     var values = [];
     for (var key in this._parts.values) {
       var states = { name: key };
-      if (this._type) {
-        states.type = this._type;
+      if (this._schema) {
+        states.schema = this._schema;
       }
       values.push(this.dialect().name(key) + ' = ' + this.dialect().value(this._parts.values[key], states));
     }
