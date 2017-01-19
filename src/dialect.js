@@ -543,10 +543,14 @@ class Dialect {
   _operator(operator, conditions, states) {
     var config;
 
-    if (operator.substr(-2) === '()') {
-      config = { builder: 'function' };
-    } else if (this._operators[operator] !== undefined) {
+    if (this._operators[operator] !== undefined) {
       config = this._operators[operator];
+    } else if(operator.substr(-2) === '()') {
+      var op = operator.substr(0, operator.length - 2);
+      if (this._operators[op] !== undefined) {
+          return '(' + this._operator(op, conditions, states) + ')';
+      }
+      config = { builder: 'function' };
     } else {
       throw new Error("Unexisting operator `'" + operator + "'`.");
     }
@@ -556,11 +560,14 @@ class Dialect {
 
     var operator = (parts[1] === 'NULL' && config.null) ? config.null : operator;
     operator = operator.charAt(0) === ':' ? operator.substr(1).toUpperCase() : operator;
-    if (config.builder === undefined) {
-      return parts.join(' ' + operator + ' ');
+    if (config.builder !== undefined) {
+      var builder = this._builders[config.builder];
+      return builder(operator, parts);
     }
-    var builder = this._builders[config.builder];
-    return builder(operator, parts);
+    if (config.format !== undefined) {
+      return config.format.replace('%s', parts.join(', '));
+    }
+    return parts.join(' ' + operator + ' ');
   }
 
   /**

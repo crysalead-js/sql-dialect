@@ -455,6 +455,30 @@ describe("Dialect", function() {
 
     });
 
+    it("applies parentheses associated to another operator", function() {
+
+      var part = this.dialect.conditions([
+        {':or()': [
+          {'!=': [
+            {':name': 'value' }, 789
+          ]},
+          {'!=': [
+            {':name': 'value' }, 0
+          ]}
+        ]},
+        {':and()': [
+          {'<': [
+            {':name': 'Table1.min' }, 123
+          ]},
+          {'>': [
+            {':name': 'Table2.max' }, 456
+          ]}
+        ]}
+      ]);
+      expect(part).toBe('("value" != 789 OR "value" != 0) AND ("Table1"."min" < 123 AND "Table2"."max" > 456)');
+
+    });
+
     it("applies casting strategy with correct params", function() {
 
       var logs = [];
