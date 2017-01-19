@@ -1,6 +1,6 @@
 {
   "name": "sql-dialect",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "SQL Builder",
   "license": "MIT",
   "repository": {
