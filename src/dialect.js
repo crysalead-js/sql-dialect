@@ -218,8 +218,8 @@ class Dialect {
       ':name': function (value, states) {
         states = states || {};
         var [alias, field] = this.undot(value);
-        var escaped = this.name(value);
-        var schema = states && states.schemas && states.schemas[alias] ? states.schemas[alias] : null;
+        var escaped = this.name(value, states ? states.aliases : undefined);
+        var schema = states && states.schemas && states.schemas[alias] ? states.schemas[alias] : undefined;
         states.name = field;
         states.schema = schema;
         return escaped;
@@ -382,11 +382,12 @@ class Dialect {
   /**
    * Generates a list of escaped table/field names identifier.
    *
-   * @param  Array  fields The fields to format.
-   * @return String        The formatted fields.
+   * @param  Object fields  The fields to format.
+   * @param  Object aliases An aliases map.
+   * @return String         The formatted fields.
    */
-  names(fields) {
-    return Array.from(this.escapes(fields, '').values()).join(', ');
+  names(fields, aliases) {
+    return Array.from(this.escapes(fields, '', aliases).values()).join(', ');
   }
 
   /**
@@ -394,11 +395,12 @@ class Dialect {
    *
    * Note: it ignores duplicates.
    *
-   * @param  String|Array names  A name or an array of names to escapes.
-   * @param  String       prefix An optionnal table/alias prefix to use.
-   * @return Map                 A Map of escaped fields.
+   * @param  String|Object names   A name or an array of names to escapes.
+   * @param  String        prefix  An optionnal table/alias prefix to use.
+   * @param  Object        aliases An aliases map.
+   * @return Map                   A Map of escaped fields.
    */
-  escapes(names, prefix) {
+  escapes(names, prefix, aliases) {
     names = Array.isArray(names) ? names : [names];
     var sql = new Map(), name, key, len, str;
     len = names.length
@@ -406,11 +408,11 @@ class Dialect {
     for (var i = 0; i < len; i++) {
       var value = names[i];
       if (typeof value === 'string') {
-        name = this.name(value);
+        name = this.name(value, aliases);
         name = prefix ? prefix + '.' + name : name;
         sql.set(name, name);
       } else if (Array.isArray(value)) {
-        var map = this.escapes(value, prefix);
+        var map = this.escapes(value, prefix, aliases);
         map.forEach(function(v, k) {
           sql.set(k, v);
         });
@@ -421,12 +423,13 @@ class Dialect {
           sql.set(str, str);
         } else {
           if (Array.isArray(value[key])) {
-            var map = this.escapes(value[key], this.escape(key));
+            var alias = (aliases && aliases[key]) ? aliases[key] : key;
+            var map = this.escapes(value[key], this.escape(alias), aliases);
             map.forEach(function(v, k) {
               sql.set(k, v);
             });
           } else {
-            name = this.name(key);
+            name = this.name(key, aliases);
             value = this.name(value[key]);
             name = name !== value ? name + ' AS ' + value : name;
             name = prefix ? prefix + '.' + name : name;
@@ -523,6 +526,7 @@ class Dialect {
       'prepend' : false,
       'operator': ':and',
       'schemas' : {},
+      'aliases' : {},
       'schema'  : undefined,
       'name'    : undefined
     };
@@ -624,7 +628,7 @@ class Dialect {
    */
   _name(name, value, states) {
     var [alias, field] = this.undot(name);
-    var escaped = this.name(name);
+    var escaped = this.name(name, states.aliases);
     var schema = states.schemas[alias];
     states.name = field;
     states.schema = schema;
@@ -667,14 +671,18 @@ class Dialect {
   /**
    * Escapes a column/table/schema with dotted syntax support.
    *
-   * @param  String name The identifier name.
-   * @return String      The escaped identifier.
+   * @param  String name    The identifier name.
+   * @param  array  aliases An aliases map.
+   * @return String         The escaped identifier.
    */
-  name(name) {
+  name(name, aliases) {
     if (typeof name !== 'string') {
-      return this.names(name);
+      return this.names(name, aliases);
     }
     var parts = this.undot(name);
+    if (aliases && aliases[parts[0]]) {
+      parts[0] = aliases[parts[0]];
+    }
     return parts[0] ? this.escape(parts[0]) + '.' + this.escape(parts[1]) : this.escape(name);
   }
 
@@ -696,7 +704,7 @@ class Dialect {
    */
   undot(field) {
     if (typeof field === 'string') {
-      var pos = field.indexOf('.');
+      var pos = field.lastIndexOf('.');
       if (pos !== -1) {
         return [field.substr(0, pos), field.substr(pos + 1)];
       }

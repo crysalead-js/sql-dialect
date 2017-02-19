@@ -183,6 +183,13 @@ describe("Select", function() {
 
     });
 
+    it("supports custom aliasing", function() {
+
+      this.select.from('table').where({ 'some.thing.field1': 'value' });
+      expect(this.select.toString({}, { 'some.thing': 'alias' })).toBe('SELECT * FROM "table" WHERE "alias"."field1" = \'value\'');
+
+    });
+
   });
 
   describe(".group()", function() {
@@ -270,6 +277,13 @@ describe("Select", function() {
           .having(true);
 
       expect(this.select.toString()).toBe('SELECT * FROM "table" GROUP BY "field" HAVING TRUE AND TRUE');
+
+    });
+
+    it("supports custom aliasing", function() {
+
+      this.select.from('table').having({ 'some.thing.field1': 'value' });
+      expect(this.select.toString({}, { 'some.thing': 'alias' })).toBe('SELECT * FROM "table" HAVING "alias"."field1" = \'value\'');
 
     });
 

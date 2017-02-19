@@ -227,6 +227,23 @@ describe("Dialect", function() {
 
     });
 
+    it("supports custom aliasing", function() {
+
+      var part = this.dialect.names('some.thing.fieldname', { 'some.thing': 'alias' });
+      expect(part).toBe('"alias"."fieldname"');
+
+      part = this.dialect.names({ 'some.thing.fieldname': 'F1' }, { 'some.thing': 'alias' });
+      expect(part).toBe('"alias"."fieldname" AS "F1"');
+
+      part = this.dialect.names({
+          'some.thing': [
+              'field1', { field1: 'F1' }, { 'field1': 'F11' }
+          ]
+      }, { 'some.thing': 'alias' });
+      expect(part).toBe('"alias"."field1", "alias"."field1" AS "F1", "alias"."field1" AS "F11"');
+
+    });
+
   });
 
   describe(".value()", function() {
@@ -264,6 +281,9 @@ describe("Dialect", function() {
     it("format names", function() {
 
       expect(this.dialect.format(':name', 'fieldname')).toBe('"fieldname"');
+
+      var states = { aliases: {'some.thing': 'alias' } };
+      expect(this.dialect.format(':name', 'some.thing.fieldname', states)).toBe('"alias"."fieldname"');
 
     });
 
@@ -541,6 +561,17 @@ describe("Dialect", function() {
         this.dialect.conditions({':undefined': ['one', 'two']});
       }.bind(this);
       expect(closure).toThrow(new Error("Unexisting operator `':undefined'`."));
+
+    });
+
+    it("supports custom aliasing", function() {
+
+      var part = this.dialect.conditions({
+        'some.thing.field1': 'value'
+      }, {
+        aliases: { 'some.thing': 'alias' }
+      });
+      expect(part).toBe('"alias"."field1" = \'value\'');
 
     });
 
