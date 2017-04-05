@@ -11,7 +11,7 @@
     "sql"
   ],
   "dependencies": {
-    "extend-merge": "^1.0.4",
+    "extend-merge": "^1.0.5",
     "string-placeholder": "^1.0.1"
   },
   "main": "src/index.js",
