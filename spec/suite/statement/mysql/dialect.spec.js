@@ -8,18 +8,34 @@ describe("MySql Dialect", function() {
 
   describe(".field()", function() {
 
-    it("adds string default values", function() {
+    it("formats a column with `varchar` by default", function() {
 
       var field = this.dialect.field({ name: 'title' });
       expect(field).toEqual({
-        name      : 'title',
-        use       : 'varchar',
-        length    : 255,
-        type      : null,
-        precision : null,
-        serial    : false,
-        null      : null,
-        'default' : null
+        name: 'title',
+        use: 'varchar',
+        length: 255,
+        type: null,
+        precision: null,
+        serial: false,
+        null: null,
+        default: null
+      });
+
+    });
+
+    it("ignores invalid types when the `'use'` options is set", function() {
+
+      $field = this.dialect.field({ type: 'invalid', name: 'title', use: 'text' });
+      expect($field).toEqual({
+        type: 'invalid',
+        name: 'title',
+        use: 'text',
+        length: null,
+        precision: null,
+        serial: false,
+        null: null,
+        default: null
       });
 
     });

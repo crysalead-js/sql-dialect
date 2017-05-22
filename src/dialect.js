@@ -345,11 +345,14 @@ class Dialect {
     if (field.name === undefined) {
       throw new Error("Missing column name.");
     }
-    if (field.type) {
-      field = extend({}, this.type(field.type), field);
-    } else if (field.use === undefined) {
-      field = extend({}, this.type('string'), field);
+    if (field.use === undefined) {
+      if (field.type !== undefined) {
+        field = extend({}, this.type(field.type), field);
+      } else {
+        field = extend({}, this.type('string'), field);
+      }
     }
+
     return extend({
       'name'     : null,
       'type'     : null,
