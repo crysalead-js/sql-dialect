@@ -59,6 +59,15 @@ describe("Select", function() {
 
     });
 
+    it("sets multiple fields through an alias", function() {
+
+      this.select.from('table').fields([{ Person: ['firstname'] }]);
+      this.select.from('table').fields([{ Person: ['lastname'] }]);
+
+      expect(this.select.toString()).toBe('SELECT "Person"."firstname", "Person"."lastname" FROM "table"');
+
+    });
+
   });
 
   describe(".from()", function() {
