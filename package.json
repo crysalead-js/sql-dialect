@@ -18,7 +18,6 @@
   "devDependencies": {
     "chai-kahlan": "^1.0.4",
     "coveralls": "^2.13.1",
-    "isparta": "^4.0.0",
     "jasmine-kahlan": "^1.0.2",
     "mocha": "^3.4.2",
     "nyc": "^10.3.2"
