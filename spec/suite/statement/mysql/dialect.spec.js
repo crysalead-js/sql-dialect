@@ -26,8 +26,8 @@ describe("MySql Dialect", function() {
 
     it("ignores invalid types when the `'use'` options is set", function() {
 
-      $field = this.dialect.field({ type: 'invalid', name: 'title', use: 'text' });
-      expect($field).toEqual({
+      field = this.dialect.field({ type: 'invalid', name: 'title', use: 'text' });
+      expect(field).toEqual({
         type: 'invalid',
         name: 'title',
         use: 'text',
@@ -329,11 +329,11 @@ describe("MySql Dialect", function() {
 
         var data = {
           name: 'fieldname',
-          type: 'text',
-          'default': 'value'
+          type: 'string',
+          default: 'value'
         };
         var result = this.dialect.column(data);
-        expect(result).toBe('`fieldname` text DEFAULT \'value\'');
+        expect(result).toBe('`fieldname` varchar(255) DEFAULT \'value\'');
 
       });
 
@@ -343,10 +343,30 @@ describe("MySql Dialect", function() {
           name: 'fieldname',
           type: 'float',
           length: 10,
-          'default': ''
+          default: ''
         };
         var result = this.dialect.column(data);
         expect(result).toBe('`fieldname` float(10) NULL');
+
+      });
+
+      it("ignores default for BLOB/TEXT", function() {
+
+        var data = {
+          name: 'fieldname',
+          use: 'text',
+          default: 'value'
+        };
+        var result = this.dialect.column(data);
+        expect(result).toBe('`fieldname` text');
+
+        data = {
+          name: 'fieldname',
+          use: 'blob',
+          default: 'value'
+        };
+        result = this.dialect.column(data);
+        expect(result).toBe('`fieldname` blob');
 
       });
 
