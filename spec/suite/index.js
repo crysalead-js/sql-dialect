@@ -15,6 +15,7 @@ require('./statement/mysql/delete.spec');
 
 require('./statement/postgresql/dialect.spec');
 require('./statement/postgresql/create-table.spec');
+require('./statement/postgresql/select.spec');
 require('./statement/postgresql/insert.spec');
 require('./statement/postgresql/update.spec');
 require('./statement/postgresql/delete.spec');

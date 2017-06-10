@@ -32,7 +32,8 @@ class Select extends Statement {
       having   : [],
       order    : new Map(),
       limit    : '',
-      forUpdate: false
+      lock     : false,
+      noWait   : false
     }
 
   }
@@ -142,14 +143,24 @@ class Select extends Statement {
   }
 
   /**
-   * Sets `FOR UPDATE` mode.
+   * Set the lock mode.
    *
-   * @param  Boolean  forUpdate The `FOR UPDATE` value.
-   * @return Function           Returns `this`.
+   * @param  Boolean mode The lock mode.
+   * @return self         Returns `this`.
    */
-  forUpdate(forUpdate) {
-    var forUpdate = forUpdate === undefined ? true : forUpdate;
-    this._parts.forUpdate = forUpdate;
+  lock(mode) {
+    return this;
+  }
+
+  /**
+   * Set the `NOWAIT` mode.
+   *
+   * @param  Boolean noWait The `NOWAIT` mode.
+   * @return self           Returns `this`.
+   */
+  noWait(noWait) {
+    noWait = noWait || true;
+    this._parts.noWait = noWait;
     return this;
   }
 
@@ -185,8 +196,12 @@ class Select extends Statement {
       this._buildClause('GROUP BY', this._buildGroup()) +
       this._buildClause('HAVING', this.dialect().conditions(this._parts.having, { schemas: schemas, aliases: aliases })) +
       this._buildOrder() +
-      this._buildClause('LIMIT', this._parts.limit) +
-      this._buildFlag('FOR UPDATE', this._parts.forUpdate);
+      this._buildClause('LIMIT', this._parts.limit);
+
+    if (this._parts.lock) {
+      sql += this._buildFlag(this._parts.lock, this._parts.lock) +
+        this._buildFlag('NOWAIT', this._parts.noWait);
+    }
 
     return this._alias ? '(' + sql + ') AS ' + this.dialect().name(this._alias) : sql;
   }

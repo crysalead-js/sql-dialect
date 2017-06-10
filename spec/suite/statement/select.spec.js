@@ -20,19 +20,6 @@ describe("Select", function() {
 
   });
 
-  describe(".forUpdate()", function() {
-
-    it("sets the `FOR UPDATE` flag", function() {
-
-      this.select.from('table')
-          .forUpdate()
-          .fields('firstname');
-      expect(this.select.toString()).toBe('SELECT "firstname" FROM "table" FOR UPDATE');
-
-    });
-
-  });
-
   describe(".fields()", function() {
 
     it("sets the fields", function() {
