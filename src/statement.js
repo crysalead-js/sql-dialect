@@ -225,10 +225,10 @@ class Statement {
    *
    * @return String The `ORDER BY` clause.
    */
-  _buildOrder() {
+  _buildOrder(aliases) {
     var result = [];
     this._parts.order.forEach(function(dir, column) {
-      result.push(this.dialect().name(column) + ' ' + dir);
+      result.push(this.dialect().name(column, aliases) + ' ' + dir);
     }.bind(this));
     return this._buildClause('ORDER BY', result.join(', '));
   }

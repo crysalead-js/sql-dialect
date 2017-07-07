@@ -195,7 +195,7 @@ class Select extends Statement {
       this._buildClause('WHERE', this.dialect().conditions(this._parts.where, { schemas: schemas, aliases: aliases })) +
       this._buildClause('GROUP BY', this._buildGroup()) +
       this._buildClause('HAVING', this.dialect().conditions(this._parts.having, { schemas: schemas, aliases: aliases })) +
-      this._buildOrder() +
+      this._buildOrder(aliases) +
       this._buildClause('LIMIT', this._parts.limit);
 
     if (this._parts.lock) {

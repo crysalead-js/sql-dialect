@@ -345,6 +345,13 @@ describe("Select", function() {
 
     });
 
+    it("support aliases", function() {
+
+      this.select.from({ Table: 'table' }).order('table.field');
+      expect(this.select.toString({}, { table: 'Table' })).toBe('SELECT * FROM "Table" AS "table" ORDER BY "Table"."field" ASC');
+
+    });
+
   });
 
   describe(".limit()", function() {
