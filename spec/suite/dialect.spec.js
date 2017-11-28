@@ -503,13 +503,14 @@ describe("Dialect", function() {
 
       var logs = [];
 
-      var defaultSchema = function(){};
-      var table1Schema = function(){};
-      var table2Schema = function(){};
+      var defaultSchema = function(value) { return value; };
+      var table1Schema = function(value) { return Number.parseInt(value) - 2; };
+      var table2Schema = function(value) { return Number.parseInt(value) + 2; };
 
       var caster = function(value, states) {
         logs.push(extend({}, states));
-        return value;
+        var schema = states.schema ? states.schema : function(value) { return value; };
+        return schema(value);
       };
 
       this.dialect.caster(caster);
@@ -520,21 +521,27 @@ describe("Dialect", function() {
         ]},
         {':or': [
           {'<': [
-            {':name': 'Table1.min' }, 123
+            {':name': 'table1.min' }, 123
           ]},
           {'>': [
-            {':name': 'Table2.max' }, 456
+            {':name': 'table2.max' }, 456
           ]}
         ]},
         {'!=': [
           {':name': 'value' }, 0
         ]}
-      ], { schemas: {
-        '': defaultSchema,
-        'Table1': table1Schema,
-        'Table2': table2Schema
-      }});
-      expect(result).toBe('"value" != 789 AND "Table1"."min" < 123 OR "Table2"."max" > 456 AND "value" != 0');
+      ], {
+        schemas: {
+          '': defaultSchema,
+          'Table1': table1Schema,
+          'Table2': table2Schema
+        },
+        aliases: {
+          'table1': 'Table1',
+          'table2': 'Table2'
+        }
+      });
+      expect(result).toBe('"value" != 789 AND "Table1"."min" < 121 OR "Table2"."max" > 458 AND "value" != 0');
 
       expect(logs.length).toBe(4);
       expect(logs[0].schema).toBe(defaultSchema);
@@ -597,7 +604,7 @@ describe("Dialect", function() {
 
     context("with conditions", function() {
 
-      it("prefixes field names", function() {
+      it("builds a condition", function() {
 
         var part = this.dialect.conditions(this.dialect.prefix([
           'value1',

@@ -30,7 +30,7 @@ describe("Select", function() {
 
     });
 
-    it("sets the fields", function() {
+    it("sets aliased fields", function() {
 
       this.select.from('table')
           .fields({ 'firstname': 'FN' }, { 'lastname': 'LN' });

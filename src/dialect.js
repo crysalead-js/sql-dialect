@@ -218,6 +218,9 @@ class Dialect {
       ':name': function (value, states) {
         states = states || {};
         var [alias, field] = this.undot(value);
+        if (states.aliases && states.aliases[alias]) {
+          alias = states.aliases[alias];
+        }
         var escaped = this.name(value, states ? states.aliases : undefined);
         var schema = states && states.schemas && states.schemas[alias] ? states.schemas[alias] : undefined;
         states.name = field;
