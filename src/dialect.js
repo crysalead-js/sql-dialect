@@ -6,6 +6,7 @@ var Select = require('./statement/select');
 var Insert = require('./statement/insert');
 var Update = require('./statement/update');
 var Delete = require('./statement/delete');
+var Truncate = require('./statement/truncate');
 var CreateTable = require('./statement/create-table');
 var DropTable = require('./statement/drop-table');
 
@@ -949,6 +950,7 @@ Dialect._classes = {
   'insert'      : Insert,
   'update'      : Update,
   'delete'      : Delete,
+  'truncate'    : Truncate,
   'create table': CreateTable,
   'drop table'  : DropTable
 };

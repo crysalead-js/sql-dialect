@@ -6,6 +6,7 @@ var Select = require('../statement/sqlite/select');
 var Insert = require('../statement/sqlite/insert');
 var Update = require('../statement/sqlite/update');
 var Delete = require('../statement/sqlite/delete');
+var Truncate = require('../statement/sqlite/truncate');
 var CreateTable = require('../statement/create-table');
 var DropTable = require('../statement/drop-table');
 
@@ -152,6 +153,7 @@ Sqlite._classes = {
   'insert'      : Insert,
   'update'      : Update,
   'delete'      : Delete,
+  'truncate'    : Truncate,
   'create table': CreateTable,
   'drop table'  : DropTable
 };
