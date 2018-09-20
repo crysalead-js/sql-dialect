@@ -17,10 +17,10 @@
   "main": "src/index.js",
   "devDependencies": {
     "chai-kahlan": "^1.0.4",
-    "coveralls": "^2.13.1",
+    "coveralls": "^3.0.2",
     "jasmine-kahlan": "^1.0.2",
-    "mocha": "^3.4.2",
-    "nyc": "^11.0.2"
+    "mocha": "^5.2.0",
+    "nyc": "^13.0.1"
   },
   "scripts": {
     "coverage-report": "nyc --reporter=lcov mocha",
