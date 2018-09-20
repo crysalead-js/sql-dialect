@@ -6,6 +6,7 @@ var Select = require('../statement/mysql/select');
 var Insert = require('../statement/mysql/insert');
 var Update = require('../statement/mysql/update');
 var Delete = require('../statement/mysql/delete');
+var Truncate = require('../statement/truncate');
 var CreateTable = require('../statement/create-table');
 var DropTable = require('../statement/drop-table');
 
@@ -190,6 +191,7 @@ MySql._classes = {
   'insert'      : Insert,
   'update'      : Update,
   'delete'      : Delete,
+  'truncate'    : Truncate,
   'create table': CreateTable,
   'drop table'  : DropTable
 };

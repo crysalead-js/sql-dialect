@@ -13,6 +13,7 @@ require('./statement/mysql/select.spec');
 require('./statement/mysql/insert.spec');
 require('./statement/mysql/update.spec');
 require('./statement/mysql/delete.spec');
+require('./statement/mysql/truncate.spec');
 
 require('./statement/postgresql/dialect.spec');
 require('./statement/postgresql/create-table.spec');
@@ -20,6 +21,7 @@ require('./statement/postgresql/select.spec');
 require('./statement/postgresql/insert.spec');
 require('./statement/postgresql/update.spec');
 require('./statement/postgresql/delete.spec');
+require('./statement/postgresql/truncate.spec');
 
 require('./statement/sqlite/dialect.spec');
 require('./statement/sqlite/create-table.spec');

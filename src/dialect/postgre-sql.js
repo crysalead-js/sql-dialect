@@ -6,6 +6,7 @@ var Select = require('../statement/postgresql/select');
 var Insert = require('../statement/postgresql/insert');
 var Update = require('../statement/postgresql/update');
 var Delete = require('../statement/postgresql/delete');
+var Truncate = require('../statement/truncate');
 var CreateTable = require('../statement/create-table');
 var DropTable = require('../statement/drop-table');
 
@@ -200,6 +201,7 @@ PostgreSql._classes = {
   'insert'      : Insert,
   'update'      : Update,
   'delete'      : Delete,
+  'truncate'    : Truncate,
   'create table': CreateTable,
   'drop table'  : DropTable
 };
