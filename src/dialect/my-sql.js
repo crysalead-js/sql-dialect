@@ -53,9 +53,9 @@ class MySql extends Dialect {
       'foreign key': {
         template: 'FOREIGN KEY (${foreignKey}) REFERENCES ${to} (${primaryKey}) ${on}'
       },
-      'index': { template: 'INDEX (${column})' },
+      'index': { template: 'INDEX ${name} (${column})' },
       'unique': {
-        template: 'UNIQUE ${index} (${column})',
+        template: 'UNIQUE ${index} ${name} (${column})',
         key: 'KEY',
         index: 'INDEX'
       },

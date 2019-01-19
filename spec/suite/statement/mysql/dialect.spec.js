@@ -149,7 +149,7 @@ describe("MySql Dialect", function() {
 
         var data = { column: ['id'] };
         var result = this.dialect.constraint('unique', data);
-        expect(result).toBe('UNIQUE (`id`)');
+        expect(result).toBe('UNIQUE `id` (`id`)');
 
       });
 
@@ -157,7 +157,7 @@ describe("MySql Dialect", function() {
 
         var data = { column: ['id', 'name'] };
         var result = this.dialect.constraint('unique', data);
-        expect(result).toBe('UNIQUE (`id`, `name`)');
+        expect(result).toBe('UNIQUE `id_name` (`id`, `name`)');
 
       });
 
@@ -165,7 +165,7 @@ describe("MySql Dialect", function() {
 
         var data = { column: ['id', 'name'], index: true };
         var result = this.dialect.constraint('unique', data);
-        expect(result).toBe('UNIQUE INDEX (`id`, `name`)');
+        expect(result).toBe('UNIQUE INDEX `id_name` (`id`, `name`)');
 
       });
 
@@ -173,7 +173,7 @@ describe("MySql Dialect", function() {
 
         var data = { column: ['id', 'name'], key: true };
         var result = this.dialect.constraint('unique', data);
-        expect(result).toBe('UNIQUE KEY (`id`, `name`)');
+        expect(result).toBe('UNIQUE KEY `id_name` (`id`, `name`)');
 
       });
 

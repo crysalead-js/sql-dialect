@@ -928,10 +928,11 @@ class Dialect {
         case 'primaryKey':
         case 'foreignKey':
           value = Array.isArray(value) ? value : [value];
-          value = value.map(function(val) {
+          var names = value.map(function(val) {
             return this.name(val);
           }.bind(this));
-          data[name] = value.join(', ');
+          data[name] = names.join(', ');
+          data['name'] = this.name(value.join('_'));
         break;
       }
     }

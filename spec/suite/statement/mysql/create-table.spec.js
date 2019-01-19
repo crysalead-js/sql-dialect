@@ -219,7 +219,7 @@ describe("MySql CreateTable", function() {
           ])
           .constraint({ type: 'unique', column: 'email' });
 
-      var expected  = 'CREATE TABLE `table1` (`email` varchar(255), UNIQUE (`email`))';
+      var expected  = 'CREATE TABLE `table1` (`email` varchar(255), UNIQUE `email` (`email`))';
       expect(this.create.toString()).toBe(expected);
 
     });
@@ -233,7 +233,7 @@ describe("MySql CreateTable", function() {
           ])
           .constraint({ type: 'unique', column: ['firstname', 'lastname'] });
 
-      var expected  = 'CREATE TABLE `table1` (`firstname` varchar(255), `lastname` varchar(255), UNIQUE (`firstname`, `lastname`))';
+      var expected  = 'CREATE TABLE `table1` (`firstname` varchar(255), `lastname` varchar(255), UNIQUE `firstname_lastname` (`firstname`, `lastname`))';
       expect(this.create.toString()).toBe(expected);
 
     });
@@ -247,7 +247,7 @@ describe("MySql CreateTable", function() {
           ])
           .constraint({ type: 'unique', column: ['firstname', 'lastname'], index: true });
 
-      var expected  = 'CREATE TABLE `table1` (`firstname` varchar(255), `lastname` varchar(255), UNIQUE INDEX (`firstname`, `lastname`))';
+      var expected  = 'CREATE TABLE `table1` (`firstname` varchar(255), `lastname` varchar(255), UNIQUE INDEX `firstname_lastname` (`firstname`, `lastname`))';
       expect(this.create.toString()).toBe(expected);
 
     });
@@ -261,7 +261,7 @@ describe("MySql CreateTable", function() {
           ])
           .constraint({ type: 'unique', column: ['firstname', 'lastname'], key: true });
 
-      var expected  = 'CREATE TABLE `table1` (`firstname` varchar(255), `lastname` varchar(255), UNIQUE KEY (`firstname`, `lastname`))';
+      var expected  = 'CREATE TABLE `table1` (`firstname` varchar(255), `lastname` varchar(255), UNIQUE KEY `firstname_lastname` (`firstname`, `lastname`))';
       expect(this.create.toString()).toBe(expected);
 
     });

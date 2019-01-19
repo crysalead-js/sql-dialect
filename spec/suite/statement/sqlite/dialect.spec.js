@@ -103,7 +103,7 @@ describe("Sqlite Dialect", function() {
 
         var data = { column: ['id'] };
         var result = this.dialect.constraint('unique', data);
-        expect(result).toBe('UNIQUE ("id")');
+        expect(result).toBe('CONSTRAINT "id" UNIQUE ("id")');
 
       });
 
@@ -111,7 +111,7 @@ describe("Sqlite Dialect", function() {
 
         var data = { column: ['id', 'name'] };
         var result = this.dialect.constraint('unique', data);
-        expect(result).toBe('UNIQUE ("id", "name")');
+        expect(result).toBe('CONSTRAINT "id_name" UNIQUE ("id", "name")');
 
       });
 

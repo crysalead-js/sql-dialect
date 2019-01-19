@@ -78,7 +78,7 @@ class PostgreSql extends Dialect {
         template: 'FOREIGN KEY (${foreignKey}) REFERENCES ${to} (${primaryKey}) ${on}'
       },
       'unique': {
-        template: 'UNIQUE ${index} (${column})'
+        template: 'CONSTRAINT ${name} UNIQUE ${index} (${column})'
       },
       'check': { template: '${constraint} CHECK (${expr})' }
     };
