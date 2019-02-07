@@ -162,7 +162,7 @@ class MySql extends Dialect {
       result.push('NOT NULL AUTO_INCREMENT');
     } else {
       result.push(typeof nil === 'boolean' ? (nil ? 'NULL' : 'NOT NULL') : '');
-      if (dft != null && ['text', 'blob'].indexOf(use.toLowerCase()) === -1) {
+      if (dft != null && ['text', 'blob', 'geometry', 'json'].indexOf(use.toLowerCase()) === -1) {
         if (dft.constructor === Object) {
           var operator = Object.keys(dft)[0];
           dft = dft[operator];

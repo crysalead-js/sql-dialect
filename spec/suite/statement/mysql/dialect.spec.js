@@ -368,6 +368,22 @@ describe("MySql Dialect", function() {
         result = this.dialect.column(data);
         expect(result).toBe('`fieldname` blob');
 
+        data = {
+          name: 'fieldname',
+          use: 'geometry',
+          default: 'value'
+        };
+        result = this.dialect.column(data);
+        expect(result).toBe('`fieldname` geometry');
+
+        data = {
+          name: 'fieldname',
+          use: 'json',
+          default: 'value'
+        };
+        result = this.dialect.column(data);
+        expect(result).toBe('`fieldname` json');
+
       });
 
     });
