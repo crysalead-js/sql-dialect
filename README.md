@@ -102,8 +102,7 @@ select
     { fielname: 'value' }
   ])
   .order('bar')                 // ORDER BY
-  .limit(10)                    // LIMIT
-  .offset(40)                   // OFFSET
+  .limit(10, 40)                // LIMIT AND OFFSET AS SECOND PARAMETER
   .forUpdate()                  // FOR UPDATE
 ?>
 ```
@@ -335,12 +334,11 @@ var insert = dialect.statement('insert');
 
 insert.into('table')               // INTO
       .values([                    // (field1, ...) VALUES (value1, ...)"
-        { field1: 'value1' },
-        { field2: 'value2' }
-      ]);
+        { field1: 'value1', field2: 'value2', anotherField: 'value3' }
+      );
 ```
 
-The `values()` method allows you to pass an array of key-value pairs where the key is the field name and value the field value.
+The `values()` method allows you to pass an object of key-value pairs where the key is the field name and value the field value.
 
 ### UPDATE
 
