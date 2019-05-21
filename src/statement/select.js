@@ -34,7 +34,7 @@ class Select extends Statement {
       having   : [],
       order    : new Map(),
       limit    : '',
-      lock     : false,
+      lock     : null,
       noWait   : false
     }
 
