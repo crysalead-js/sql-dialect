@@ -1,13 +1,9 @@
-var Statement = require('./statement');
-var Dialect = require('./dialect');
-var MySql = require('./dialect/my-sql');
-var PostgreSql = require('./dialect/postgre-sql');
-var Sqlite = require('./dialect/sqlite');
+'use strict'
 
 module.exports = {
-  Statement: Statement,
-  Dialect: Dialect,
-  MySql: MySql,
-  PostgreSql: PostgreSql,
-  Sqlite: Sqlite
+  Statement: require('./statement')
+, Dialect: require('./dialect')
+, MySql: require('./dialect/my-sql')
+, PostgreSql: require('./dialect/postgre-sql')
+, Sqlite: require('./dialect/sqlite')
 };

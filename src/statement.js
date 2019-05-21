@@ -1,5 +1,7 @@
-var extend = require('extend-merge').extend;
-var merge = require('extend-merge').merge;
+'use strict'
+
+const ORDER_DIR_ASC = 'ASC';
+const ORDER_DIR_EXP = /^(.*?)\s+((?:a|de)sc)/i
 
 class Statement {
 
@@ -9,17 +11,15 @@ class Statement {
    * @param Object config The config object. The option is:
    *                       - 'dialect' `object` a dialect adapter.
    */
-  constructor(config) {
-    var defaults = { dialect: null };
-
-    config = extend({}, defaults, config);
+  constructor(config = {}) {
+    const opts = Object.assign({}, {dialect: null}, config);
 
     /**
      * Pointer to the dialect adapter.
      *
      * @var Function
      */
-    this._dialect = config['dialect'];
+    this._dialect = opts['dialect'];
 
     /**
      * The SQL parts.
@@ -41,12 +41,12 @@ class Statement {
    * @return Function         The dialect instance or `this` on set.
    */
   dialect(dialect) {
-    if (arguments.length) {
+    if (dialect) {
       this._dialect = dialect;
       return this;
     }
     if (!this._dialect) {
-      throw new Error('Missing SQL dialect adapter.');
+      throw new Error(`Missing SQL dialect adapter.`);
     }
     return this._dialect;
   }
@@ -58,11 +58,12 @@ class Statement {
    * @param  mixed  value The value to set.
    * @return mixed         The setted value.
    */
-  data(name, value) {
-    if (!arguments.length) {
+  data(...args) {
+    if (!args.length) {
       throw new Error('Missing name argument.');
     }
-    if (arguments.length === 2) {
+    const [name, value] = args
+    if (args.length === 2) {
       return this._parts[name] = value;
     }
     return this._parts[name];
@@ -75,8 +76,7 @@ class Statement {
    * @param  Boolean enable The boolean value to set.
    * @return Boolean        The flag value.
    */
-  setFlag(flag, enable) {
-    var enable = enable !== undefined ? enable : true;
+  setFlag(flag, enable = true) {
     this._parts.flags.set(flag, !!enable);
     return enable;
   }
@@ -98,9 +98,9 @@ class Statement {
    * @return Object                   Returns `this`.
    */
   where(conditions) {
-    var conditions = Array.isArray(conditions) && arguments.length === 1 ? conditions : Array.prototype.slice.call(arguments);
-    if (conditions.length) {
-      this._parts.where.push(conditions);
+    const args = Array.isArray(conditions) && arguments.length === 1 ? conditions : Array.prototype.slice.call(arguments);
+    if (args.length) {
+      this._parts.where.push(args);
     }
     return this;
   }
@@ -115,11 +115,12 @@ class Statement {
     if (!fields) {
       return this;
     }
-    var fields = Array.isArray(fields) && arguments.length === 1 ? fields : Array.prototype.slice.call(arguments);
-    var map = this._order(fields);
-    map.forEach(function(dir, column) {
+    const _flds = Array.isArray(fields) && arguments.length === 1 ? fields : Array.prototype.slice.call(arguments);
+    const map = this._order(_flds);
+
+    for (const [column, dir] of map.entries()) {
       this._parts.order.set(column, dir);
-    }.bind(this));
+    }
     return this;
   }
 
@@ -134,8 +135,10 @@ class Statement {
     if (!limit) {
       return this;
     }
-    var limit = offset ? String(limit) + ' OFFSET ' + String(offset) : String(limit);
-    this._parts.limit = limit;
+
+    this._parts.limit = offset
+      ? String(limit) + ' OFFSET ' + String(offset)
+      : String(limit);
     return this;
   }
 
@@ -146,27 +149,22 @@ class Statement {
    * @return Map           The fields map.
    */
   _order(fields) {
-    var direction = 'ASC';
+    const result = new Map();
 
-    var result = new Map();
-    var len = fields.length;
-
-    for (var i = 0; i < len; i++) {
-      var value = fields[i];
+    for (const value of fields) {
       if (value && value.constructor === Object) {
-        var key = Object.keys(value)[0];
+        const key = Object.keys(value)[0];
         result.set(key, value[key]);
         continue;
       }
-      var matches = value.match(/^(.*?)\s+((?:a|de)sc)/i);
-      var dir;
+      const matches = value.match(ORDER_DIR_EXP);
+
       if (matches) {
-        value = matches[1];
-        dir = matches[2];
-      } else {
-        dir = direction;
+        result.set(matches[1], matches[2]);
+        continue;
       }
-      result.set(value, dir);
+
+      result.set(value, ORDER_DIR_ASC);
     }
     return result;
   }
@@ -189,13 +187,12 @@ class Statement {
    * @return String        The formatted flags.
    */
   _buildFlags(flags) {
-    var key;
-    var enabled = [];
-    flags.forEach(function(value, flag) {
+    const enabled = [];
+    for (const [flag, value] of flags.entries()) {
       if (value) {
         enabled.push(flag);
       }
-    });
+    }
     return enabled.length ? ' ' + enabled.join(' ') : '';
   }
 
@@ -226,10 +223,13 @@ class Statement {
    * @return String The `ORDER BY` clause.
    */
   _buildOrder(aliases) {
-    var result = [];
-    this._parts.order.forEach(function(dir, column) {
-      result.push(this.dialect().name(column, aliases) + ' ' + dir);
-    }.bind(this));
+    const result = [];
+    const orderby = this._parts.order;
+    const dialect = this.dialect()
+
+    for(const [column, dir] of orderby.entries()){
+      result.push(dialect.name(column, aliases) + ' ' + dir);
+    }
     return this._buildClause('ORDER BY', result.join(', '));
   }
 

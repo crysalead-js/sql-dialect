@@ -1,14 +1,20 @@
-var extend = require('extend-merge').extend;
-var merge = require('extend-merge').merge;
-var string = require('string-placeholder');
+'use strict'
 
-var Select = require('./statement/select');
-var Insert = require('./statement/insert');
-var Update = require('./statement/update');
-var Delete = require('./statement/delete');
-var Truncate = require('./statement/truncate');
-var CreateTable = require('./statement/create-table');
-var DropTable = require('./statement/drop-table');
+const string = require('string-placeholder');
+const {merge} = require('extend-merge');
+
+const {
+  Select
+, Insert
+, Update
+, Delete
+, Truncate
+, CreateTable
+, DropTable
+} = require('./statement/index');
+
+//TODO(esatterwhite) shouldn't this have a $ anchor?
+const IS_NUMERIC_EXP = /^(integer|float|boolean)/
 
 /**
  * ANSI SQL dialect
@@ -22,8 +28,8 @@ class Dialect {
    * @return mixed          The classes dependencies.
    */
   static classes(classes) {
-    if (arguments.length) {
-      this._classes = merge({}, this._classes, classes);
+    if (classes) {
+      this._classes = Object.assign({}, this._classes, classes);
     }
     return this._classes;
   }
@@ -34,25 +40,24 @@ class Dialect {
    * @param array config The config array
    */
   constructor(config) {
-    var defaults = {
-      'classes': this.constructor.classes(),
-      'quoter': null,
-      'caster': null,
-      'types': {},
-      'operators': this._defaultOperators(),
-      'builders': this._defaultBuilders(),
-      'formatters': this._defaultFormatters(),
-      'dateFormat': 'Y-m-d H:i:s'
-    };
 
-    config = merge({}, defaults, config);
+    const opts = merge({}, {
+      classes: this.constructor.classes(),
+      quoter: null,
+      caster: null,
+      types: {},
+      operators: this._defaultOperators(),
+      builders: this._defaultBuilders(),
+      formatters: this._defaultFormatters(),
+      dateFormat: 'Y-m-d H:i:s'
+    }, config);
 
     /**
      * Class dependencies.
      *
      * @var array
      */
-    this._classes = config.classes;
+    this._classes = opts.classes;
 
     /**
      * Quoting identifier character.
@@ -66,49 +71,49 @@ class Dialect {
      *
      * @var Function
      */
-    this._quoter = config.quoter;
+    this._quoter = opts.quoter;
 
     /**
      * Casting handler.
      *
      * @var Function
      */
-    this._caster = config.caster;
+    this._caster = opts.caster;
 
     /**
      * Date format.
      *
      * @var String
      */
-    this._dateFormat = config.dateFormat;
+    this._dateFormat = opts.dateFormat;
 
     /**
      * Column type definitions.
      *
      * @var Object
      */
-    this._types = config.types;
+    this._types = opts.types;
 
     /**
      * Operator builders
      *
      * @var Object
      */
-    this._builders = config.builders;
+    this._builders = opts.builders;
 
     /**
      * List of formatter operators
      *
      * @var Object
      */
-    this._formatters = config.formatters;
+    this._formatters = opts.formatters;
 
         /**
      * List of SQL operators, paired with handling options.
      *
      * @var Object
      */
-    this._operators = config.operators;
+    this._operators = opts.operators;
 
     /**
      * Type mapping.
@@ -217,7 +222,7 @@ class Dialect {
   _defaultFormatters() {
     return {
       ':name': function (value, states) {
-        states = states || {};
+        states = states || {};
         var [alias, field] = this.undot(value);
         if (states.aliases && states.aliases[alias]) {
           alias = states.aliases[alias];
@@ -244,7 +249,7 @@ class Dialect {
    * @return Function        Returns the quoter handler.
    */
   quoter(quoter) {
-    if (arguments.length) {
+    if (quoter) {
       this._quoter = quoter;
     }
     return this._quoter;
@@ -257,7 +262,7 @@ class Dialect {
    * @return Function        Returns the casting handler.
    */
   caster(caster) {
-    if (arguments.length) {
+    if (caster) {
       this._caster = caster;
     }
     return this._caster;
@@ -288,12 +293,12 @@ class Dialect {
    * @return Function         Return `this`.
    */
   map(use, type, options) {
+    const defaults = {};
     if (this._maps[use] === undefined) {
       this._maps[use] = {};
     }
-    var defaults = {};
     defaults[type] = options ? options : {};
-    this._maps[use] = extend({}, defaults, this._maps[use]);
+    this._maps[use] = Object.assign({}, defaults, this._maps[use]);
     return this;
   }
 
@@ -306,7 +311,7 @@ class Dialect {
   mapped(column) {
     var options, use;
     if (typeof column === 'object') {
-      options = extend({}, column);
+      options = Object.assign({}, column);
       use = options.use;
       delete options.use;
     } else {
@@ -351,13 +356,13 @@ class Dialect {
     }
     if (field.use === undefined) {
       if (field.type !== undefined) {
-        field = extend({}, this.type(field.type), field);
+        field = Object.assign({}, this.type(field.type), field);
       } else {
-        field = extend({}, this.type('string'), field);
+        field = Object.assign({}, this.type('string'), field);
       }
     }
 
-    return extend({
+    return Object.assign({
       'name'     : null,
       'type'     : null,
       'length'   : null,
@@ -377,7 +382,7 @@ class Dialect {
    */
   statement(name, config) {
     var defaults = { 'dialect': this };
-    config = extend({}, defaults, config);
+    config = Object.assign({}, defaults, config);
 
     if (this._classes[name] === undefined) {
       throw new Error("Unsupported statement `'" + name + "'`.");
@@ -408,43 +413,42 @@ class Dialect {
    * @return Map                   A Map of escaped fields.
    */
   escapes(names, prefix, aliases) {
+    const sql = new Map()
+    let name;
     names = Array.isArray(names) ? names : [names];
-    var sql = new Map(), name, key, len, str;
-    len = names.length
 
-    for (var i = 0; i < len; i++) {
-      var value = names[i];
+    for (const value of names) {
       if (typeof value === 'string') {
         name = this.name(value, aliases);
         name = prefix ? prefix + '.' + name : name;
         sql.set(name, name);
       } else if (Array.isArray(value)) {
-        var map = this.escapes(value, prefix, aliases);
-        map.forEach(function(v, k) {
+        const map = this.escapes(value, prefix, aliases);
+        for(const [k, v] of map.entries()) {
           sql.set(k, v);
-        });
+        }
       } else if (value && value.constructor === Object) {
-        var key = Object.keys(value)[0];
+        const key = Object.keys(value)[0];
         if (this.isOperator(key)) {
-          str = this.conditions(value);
+          let str = this.conditions(value);
           sql.set(str, str);
         } else {
           if (Array.isArray(value[key])) {
-            var alias = (aliases && aliases[key]) ? aliases[key] : key;
-            var map = this.escapes(value[key], this.escape(alias), aliases);
-            map.forEach(function(v, k) {
+            const alias = (aliases && aliases[key]) ? aliases[key] : key;
+            const map = this.escapes(value[key], this.escape(alias), aliases);
+            for (const [k, v] of map.entries()) {
               sql.set(k, v);
-            });
+            }
           } else {
+            let alias = this.name(value[key]);
             name = this.name(key, aliases);
-            value = this.name(value[key]);
-            name = name !== value ? name + ' AS ' + value : name;
+            name = name !== value ? name + ' AS ' + alias : name;
             name = prefix ? prefix + '.' + name : name;
             sql.set(name, name);
           }
         }
       } else {
-        str = value.toString();
+        let str = value.toString();
         sql.set(str, str);
       }
     }
@@ -463,17 +467,14 @@ class Dialect {
     if (prefixValue === undefined) {
       prefixValue = true;
     }
-    names = Array.isArray(names) ? names : [names];
-    var result = [], len;
-    len = names.length;
+    const _names = Array.isArray(names) ? names : [names];
+    const result = [];
 
-    for (var i = 0; i < len; i++) {
-      var field = {};
-      var key = i;
-      var value = names[i];
+    for (let value of _names) {
+      const field = {};
 
       if (value.constructor === Object) {
-        var key = Object.keys(value)[0];
+        let key = Object.keys(value)[0];
         value = value[key];
         if (this.isOperator(key)) {
           if (key === ':name') {
@@ -501,7 +502,7 @@ class Dialect {
    * @return String        The prefixed name.
    */
   _prefix(name, prefix) {
-    var [alias, field] = this.undot(name);
+    const [alias, field] = this.undot(name);
     return alias ? name : prefix + '.' + field;
   }
 
@@ -529,18 +530,17 @@ class Dialect {
       return '';
     }
 
-    var defaults = {
+    const opts = Object.assign({}, {
       'prepend' : false,
       'operator': ':and',
       'schemas' : {},
       'aliases' : {},
       'schema'  : undefined,
       'name'    : undefined
-    };
-    options = extend({}, defaults, options);
+    }, options);
 
-    var result = this._operator(options.operator.toLowerCase(), conditions, options);
-    return (options.prepend && result) ? options.prepend + ' ' + result : result;
+    const result = this._operator(opts.operator.toLowerCase(), conditions, opts);
+    return (opts.prepend && result) ? opts.prepend + ' ' + result : result;
   }
 
   /**
@@ -802,7 +802,7 @@ class Dialect {
   column(field) {
     var field = this.field(field);
 
-    var isNumeric = /^(integer|float|boolean)/.test(field.type);
+    var isNumeric = IS_NUMERIC_EXP.test(field.type);
     if (isNumeric && field['default'] === '') {
       field.null = true;
       field['default'] = null;
@@ -820,7 +820,7 @@ class Dialect {
    * @return String            The formatted column.
    */
   _formatColumn(name, length, precision) {
-    var size = [];
+    const size = [];
     if (length) {
       size.push(length);
     }
@@ -839,18 +839,17 @@ class Dialect {
    * @return string       The SQL meta.
    */
   meta(type, data, names) {
-    var result = [];
-    var items, len;
-    if (arguments.length === 3) {
+    const result = [];
+    let items = [];
+    if (names) {
       items = Array.isArray(names) ? names : [names];
     } else {
       items = Object.keys(data);
     }
-    len = items.length;
-    for (var i = 0; i < len; i++) {
-      var name = items[i];
-      var value = data[name];
-      var meta = this._metadata(type, name, value);
+
+    for (const name of items) {
+      const value = data[name];
+      const meta = this._metadata(type, name, value);
       if (value && meta) {
         result.push(meta);
       }
@@ -867,19 +866,22 @@ class Dialect {
    * @return String       The SQL meta.
    */
   _metadata(type, name, value) {
-    var meta = this._meta[type] ? this._meta[type][name] : undefined;
+    const meta = this._meta[type] ? this._meta[type][name] : undefined;
+
     if (!meta || (meta.options && meta.options.indexOf(value) === -1 )) {
       return;
     }
-    meta = extend({}, { keyword: '', escape: false, join: ' ' }, meta);
-    var escape = meta.escape;
-    var keyword = meta.keyword;
-    var join = meta.join;
+    const opts = Object.assign({}, {
+      keyword: ''
+    , escape: false
+    , join: ' '
+    }, meta);
 
-    if (escape === true) {
+
+    if (opts.escape === true) {
       value = this.value(value);
     }
-    var result = keyword + join + value;
+    var result = opts.keyword + opts.join + value;
     return result !== ' ' ? result : '';
   }
 
@@ -892,19 +894,16 @@ class Dialect {
    * @return String            The SQL meta string.
    */
   constraint(name, constraint, options) {
-    constraint = extend({}, { options: [] }, constraint);
-
-    var meta = this._constraints[name];
-    var template = meta ? meta.template : undefined;
+    const _constraint = Object.assign({}, { options: [] }, constraint);
+    const meta = this._constraints[name];
+    const template = meta ? meta.template : undefined;
     if (!template) {
       throw new Error("Invalid constraint template `'" + name + "'`.");
     }
 
-    var data = {};
+    const data = Object.create(null);
 
-    for (var name in constraint) {
-      var value = constraint[name];
-
+    for (const [name, value] of Object.entries(_constraint)) {
       switch (name) {
         case 'key':
         case 'index':
@@ -926,14 +925,12 @@ class Dialect {
         break;
         case 'column':
         case 'primaryKey':
-        case 'foreignKey':
-          value = Array.isArray(value) ? value : [value];
-          var names = value.map(function(val) {
-            return this.name(val);
-          }.bind(this));
-          data[name] = names.join(', ');
-          data['name'] = this.name(value.join('_'));
-        break;
+        case 'foreignKey': {
+          const _val = Array.isArray(value) ? value : [value];
+          data[name] =  _val.map(this.name.bind(this)).join(', ');
+          data['name'] = this.name(_val.join('_'));
+          break;
+        }
       }
     }
 
