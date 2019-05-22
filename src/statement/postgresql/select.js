@@ -1,5 +1,14 @@
-var BaseSelect = require('../select');
+'use strict'
+const  BaseSelect = require('../select');
 
+
+const LOCK_OPTS = new Set([
+  'update'
+, 'share'
+, 'no key update'
+, 'key share'
+, false
+]);
 /**
  * `SELECT` statement.
  */
@@ -11,30 +20,30 @@ class Select extends BaseSelect {
    * @param  Boolean mode The lock mode.
    * @return self         Returns `this`.
    */
-  lock(mode) {
-    mode = mode || 'update';
-    var lock;
-    switch (mode.toLowerCase()) {
+  lock(mode = 'update') {
+    const _mode = mode.toLowerCase();
+
+    if (!LOCK_OPTS.has(_mode)) {
+      throw new Error(`Invalid PostgreSQL lock mode \`'${_mode}'\`.`);
+    }
+
+    switch (_mode) {
       case 'update':
-        lock = 'FOR UPDATE';
+        this._parts.lock = 'FOR UPDATE';
         break;
       case 'share':
-        lock = 'FOR SHARE';
+        this._parts.lock = 'FOR SHARE';
         break;
       case 'no key update':
-        lock = 'FOR NO KEY UPDATE';
+        this._parts.lock = 'FOR NO KEY UPDATE';
         break;
       case 'key share':
-        lock = 'FOR KEY SHARE';
+        this._parts.lock = 'FOR KEY SHARE';
       break;
-      case false:
-        lock = false;
-        break;
       default:
-        throw new Error("Invalid PostgreSQL lock mode `'" + mode + "'`.");
+        this._parts.lock = null;
         break;
     }
-    this._parts.lock = lock;
     return this;
   }
 }
