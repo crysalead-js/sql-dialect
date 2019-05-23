@@ -1,9 +1,7 @@
-var BaseDelete = require('../delete');
+const BaseDelete = require('../delete');
 
 /**
  * `DELETE` statement.
  */
-class Delete extends BaseDelete {
-}
 
-module.exports = Delete;
+module.exports = BaseDelete

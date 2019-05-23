@@ -1,4 +1,7 @@
-var BaseUpdate = require('../update');
+'use strict'
+const BaseUpdate = require('../update');
+const LOW_PRIORITY = 'LOW_PRIORITY'
+const IGNORE = 'IGNORE'
 
 /**
  * `UPDATE` statement.
@@ -11,7 +14,7 @@ class Update extends BaseUpdate {
    * @return Function       Returns `this`.
    */
   lowPriority(enable = true) {
-    this.setFlag('LOW_PRIORITY', enable === undefined ? true : enable);
+    this.setFlag(LOW_PRIORITY, enable === undefined ? true : enable);
     return this;
   }
 
@@ -22,7 +25,7 @@ class Update extends BaseUpdate {
    * @return Function       Returns `this`.
    */
   ignore(enable = true) {
-    this.setFlag('IGNORE', enable === undefined ? true : enable);
+    this.setFlag(IGNORE, enable === undefined ? true : enable);
     return this;
   }
 }

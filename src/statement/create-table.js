@@ -1,6 +1,5 @@
-var extend = require('extend-merge').extend;
-var merge = require('extend-merge').merge;
-var Statement = require('../statement');
+'use strict'
+const Statement = require('../statement');
 
 /**
  * `CREATE TABLE` statement.
@@ -34,8 +33,7 @@ class CreateTable extends Statement {
    * @param  Boolean  ifNotExists If `false` the table must not exists, use `true` for a soft create.
    * @return Function             Returns `this`.
    */
-  ifNotExists(ifNotExists = true)
-  {
+  ifNotExists(ifNotExists = true) {
     this._parts.ifNotExists = ifNotExists;
     return this;
   }
@@ -58,12 +56,13 @@ class CreateTable extends Statement {
    * @return Function             Returns `this`.
    */
   columns(columns) {
-    var columns = Array.isArray(columns) && arguments.length === 1 ? columns : Array.prototype.slice.call(arguments);
-    var len = columns.length;
-    for (var i = 0; i < len; i++) {
-      var column = columns[i];
+    const cols = Array.isArray(columns) && arguments.length === 1
+      ? columns
+      : Array.prototype.slice.call(arguments);
+
+    for (const column of cols) {
       if (column && column.constructor === Object) {
-        var key = Object.keys(column)[0];
+        const key = Object.keys(column)[0];
         this._parts.columns.set(key, column[key]);
       }
     }
@@ -116,8 +115,9 @@ class CreateTable extends Statement {
    * @return String       Returns the normalized column type.
    */
   type(name) {
-    if (this._parts.columns.has(name) && this._parts.columns.get(name).type !== undefined) {
-      return this._parts.columns.get(name).type;
+    const column = this._parts.columns.get(name)
+    if (column && column.type !== undefined) {
+      return column.type;
     }
     return 'string';
   }
@@ -127,8 +127,7 @@ class CreateTable extends Statement {
    *
    * @return String The generated SQL string.
    */
-  toString()
-  {
+  toString() {
     if (!this._parts.table) {
       throw new Error("Invalid `CREATE TABLE` statement missing table name.");
     }
@@ -150,43 +149,44 @@ class CreateTable extends Statement {
    * @return String The SQL columns definition.
    */
   _buildDefinition() {
-    var result = [];
-    var columns = this._parts.columns;
-    var constraints = this._parts.constraints;
-    var primary;
+    let primary;
+    const result = [];
+    const columns = this._parts.columns;
+    const constraints = this._parts.constraints;
+    const dialect = this.dialect()
 
-    columns.forEach(function(column, name) {
-      var field = extend({}, column);
-      field.name = name;
-      field = this.dialect().field(field);
+    for (const [name, column] of columns.entries()) {
+      const opts = Object.assign({ name }, column);
+      const field = dialect.field(opts);
 
       if (field.serial) {
         primary = name;
       }
-      result.push(this.dialect().column(field));
-    }.bind(this));
+      result.push(dialect.column(field));
+    }
 
     for (var constraint of constraints) {
       if (constraint.type === undefined) {
         throw new Error("Missing contraint type.");
       }
-      var meta, type = constraint.type;
-      if (meta = this.dialect().constraint(type, constraint, { schemas: {'': this } })) {
+      const type = constraint.type;
+      const meta = dialect.constraint(type, constraint, { schemas: {'': this } })
+
+      if (meta) {
         result.push(meta);
       }
+
       if (type === 'primary') {
         primary = null;
       }
     }
+
     if (primary) {
-      result.push(this.dialect().constraint('primary', { column: primary }));
+      result.push(dialect.constraint('primary', { column: primary }));
     }
 
-    result = result.filter(function(value) {
-      return !!value;
-    });
 
-    return ' (' + result.join(', ') + ')';
+    return ` (${result.filter(Boolean).join(', ')})`;
   }
 
 }

@@ -1,4 +1,11 @@
-var BaseInsert = require('../insert');
+'use strict'
+
+const BaseInsert = require('../insert');
+
+const HIGH_PRIORITY = 'HIGH_PRIORITY';
+const LOW_PRIORITY = 'LOW_PRIORITY';
+const IGNORE = 'IGNORE';
+const DELAYED = 'DELAYED';
 
 /**
  * `INSERT` statement.
@@ -11,7 +18,7 @@ class Insert extends BaseInsert {
    * @return Function        Returns `this`.
    */
   highPriority(enable) {
-    this.setFlag('HIGH_PRIORITY', enable === undefined ? true : enable);
+    this.setFlag(HIGH_PRIORITY, enable === undefined ? true : enable);
     return this;
   }
 
@@ -22,7 +29,7 @@ class Insert extends BaseInsert {
    * @return Function        Returns `this`.
    */
   lowPriority(enable) {
-    this.setFlag('LOW_PRIORITY', enable === undefined ? true : enable);
+    this.setFlag(LOW_PRIORITY, enable === undefined ? true : enable);
     return this;
   }
 
@@ -33,7 +40,7 @@ class Insert extends BaseInsert {
    * @return Function        Returns `this`.
    */
   ignore(enable) {
-    this.setFlag('IGNORE', enable === undefined ? true : enable);
+    this.setFlag(IGNORE, enable === undefined ? true : enable);
     return this;
   }
 
@@ -44,7 +51,7 @@ class Insert extends BaseInsert {
    * @return Function        Returns `this`.
    */
   delayed(enable) {
-    this.setFlag('DELAYED', enable === undefined ? true : enable);
+    this.setFlag(DELAYED, enable === undefined ? true : enable);
     return this;
   }
 

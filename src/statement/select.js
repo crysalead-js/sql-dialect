@@ -1,4 +1,6 @@
-var Statement = require('../statement');
+'use strict'
+
+const Statement = require('../statement');
 
 /**
  * `SELECT` statement.
@@ -32,7 +34,7 @@ class Select extends Statement {
       having   : [],
       order    : new Map(),
       limit    : '',
-      lock     : false,
+      lock     : null,
       noWait   : false
     }
 
@@ -56,10 +58,9 @@ class Select extends Statement {
    * @param  Array    fields The fields.
    * @return Function        Returns `this`.
    */
-  fields(fields) {
-    var fields = Array.isArray(fields) && arguments.length === 1 ? fields : Array.prototype.slice.call(arguments);
+  fields(...fields) {
     if (fields.length) {
-      this._parts.fields = this._parts.fields.concat(fields);
+      this._parts.fields.push(...toArray(fields));
     }
     return this;
   }
@@ -70,12 +71,12 @@ class Select extends Statement {
    * @param  Array    source The source or sources tables.
    * @return Function        Returns `this`.
    */
-  from(source) {
-    if (!source) {
-      throw new Error("A `FROM` clause requires a non empty table.");
+  from(...source) {
+    const tables = source.filter(Boolean)
+    if (!tables.length) {
+      throw new Error('A `FROM` clause requires a non empty table.');
     }
-    var sources = Array.isArray(source) ? source : Array.prototype.slice.call(arguments);
-    this._parts.from = this._parts.from.concat(sources);
+    this._parts.from.push(...tables);
     return this;
   }
 
@@ -104,9 +105,8 @@ class Select extends Statement {
    * @return Function            Returns `this`.
    */
   where(conditions) {
-    var conditions = Array.isArray(conditions) && arguments.length === 1 ? conditions : Array.prototype.slice.call(arguments);
-    if (conditions.length) {
-      this._parts.where.push(conditions);
+    if (conditions) {
+      this._parts.where.push(...toArray(conditions));
     }
     return this;
   }
@@ -117,12 +117,15 @@ class Select extends Statement {
    * @param  Array    fields The fields.
    * @return Function        Returns `this`.
    */
-  group(fields) {
-    if (!fields) {
+  group(...fields) {
+    if (!fields.length) {
       return this;
     }
-    var fields = Array.isArray(fields) && arguments.length === 1 ? fields : Array.prototype.slice.call(arguments);
-    for (var field of fields) {
+    const args = toArray(fields);
+    for (const field of args) {
+      if (!field) {
+        continue;
+      }
       this._parts.group.set(field, true);
     }
     return this;
@@ -134,8 +137,7 @@ class Select extends Statement {
    * @param  Array    conditions The havings for this query.
    * @return Function            Returns `this`.
    */
-  having(conditions) {
-    var conditions = Array.isArray(conditions) && arguments.length === 1 ? conditions : Array.prototype.slice.call(arguments);
+  having(...conditions) {
     if (conditions.length) {
       this._parts.having.push(conditions);
     }
@@ -158,8 +160,7 @@ class Select extends Statement {
    * @param  Boolean noWait The `NOWAIT` mode.
    * @return self           Returns `this`.
    */
-  noWait(noWait) {
-    noWait = noWait || true;
+  noWait(noWait = true) {
     this._parts.noWait = noWait;
     return this;
   }
@@ -183,18 +184,21 @@ class Select extends Statement {
    * Render the SQL statement
    *
    * @return String The generated SQL string.
+   * @TODO There are a lot of empty strings we don't need to do anything with
+   *       This results in a lot of string concatns the don't need to happen
    */
-  toString(schemas, aliases) {
-    schemas = schemas || [];
-    var fields = this.dialect().names(this._parts.fields);
+  toString(schemas = [], aliases) {
+    const dialect = this.dialect()
+    const fields = dialect.names(this._parts.fields);
+    const opts = { schemas: schemas, aliases: aliases }
     var sql = 'SELECT' +
       this._buildFlags(this._parts.flags) +
       this._buildChunk(fields ? fields : '*') +
-      this._buildClause('FROM', this.dialect().names(this._parts.from)) +
+      this._buildClause('FROM', dialect.names(this._parts.from)) +
       this._buildJoins(schemas, aliases) +
-      this._buildClause('WHERE', this.dialect().conditions(this._parts.where, { schemas: schemas, aliases: aliases })) +
+      this._buildClause('WHERE', dialect.conditions(this._parts.where, opts)) +
       this._buildClause('GROUP BY', this._buildGroup()) +
-      this._buildClause('HAVING', this.dialect().conditions(this._parts.having, { schemas: schemas, aliases: aliases })) +
+      this._buildClause('HAVING', dialect.conditions(this._parts.having, opts)) +
       this._buildOrder(aliases) +
       this._buildClause('LIMIT', this._parts.limit);
 
@@ -203,7 +207,7 @@ class Select extends Statement {
         this._buildFlag('NOWAIT', this._parts.noWait);
     }
 
-    return this._alias ? '(' + sql + ') AS ' + this.dialect().name(this._alias) : sql;
+    return this._alias ? '(' + sql + ') AS ' + dialect.name(this._alias) : sql;
   }
 
   /**
@@ -225,17 +229,18 @@ class Select extends Statement {
    * @return string The `JOIN` clause.
    */
   _buildJoins(schemas, aliases) {
-    var joins = [];
-    for (var value of this._parts.joins) {
-      var table = value.join;
-      var on = value.on;
-      var type = value.type;
-      var join = [type, 'JOIN'];
-      join.push(this.dialect().name(table));
+    const joins = [];
+    const dialect = this.dialect()
+    for (const value of this._parts.joins) {
+      const table = value.join;
+      const on = value.on;
+      const type = value.type;
+      const join = [type, 'JOIN'];
+      join.push(dialect.name(table));
 
       if (on.length) {
         join.push('ON');
-        join.push(this.dialect().conditions(on, { schemas: schemas, aliases: aliases }));
+        join.push(dialect.conditions(on, { schemas: schemas, aliases: aliases }));
       }
 
       joins.push(join.join(' '));
@@ -243,6 +248,15 @@ class Select extends Statement {
     return joins.length ? ' ' + joins.join(' ') : '';
   }
 
+}
+
+function toArray(item) {
+  if (!item) return []
+  if (Array.isArray(item)) {
+    if (Array.isArray(item[0])) return item[0]
+    return item
+  }
+  return [item]
 }
 
 module.exports = Select;

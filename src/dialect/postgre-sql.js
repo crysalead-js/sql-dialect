@@ -1,14 +1,14 @@
-var extend = require('extend-merge').extend;
-var merge = require('extend-merge').merge;
+'use strict'
+const {merge} = require('extend-merge')
 
-var Dialect = require('../dialect');
-var Select = require('../statement/postgresql/select');
-var Insert = require('../statement/postgresql/insert');
-var Update = require('../statement/postgresql/update');
-var Delete = require('../statement/postgresql/delete');
-var Truncate = require('../statement/truncate');
-var CreateTable = require('../statement/create-table');
-var DropTable = require('../statement/drop-table');
+const Dialect = require('../dialect');
+const Select = require('../statement/postgresql/select');
+const Insert = require('../statement/postgresql/insert');
+const Update = require('../statement/postgresql/update');
+const Delete = require('../statement/postgresql/delete');
+const Truncate = require('../statement/truncate');
+const CreateTable = require('../statement/create-table');
+const DropTable = require('../statement/drop-table');
 
 /**
  * PostgreSQL dialect.
@@ -20,7 +20,7 @@ class PostgreSql extends Dialect {
    * @param Object config The config array
    */
   constructor(config) {
-    var defaults = {
+    const opts = merge({}, {
       classes: PostgreSql._classes,
       operators: {
         ':regexp'        : { format: '%s ~ %s' },
@@ -44,10 +44,8 @@ class PostgreSql extends Dialect {
         ':intersect'     : { builder: 'set' },
         ':intersect all' : { builder: 'set' }
       }
-    };
-
-    var config = merge(defaults, config);
-    super(config);
+    }, config);
+    super(opts);
 
     /**
      * Escape identifier character.
@@ -151,14 +149,13 @@ class PostgreSql extends Dialect {
    * @return String       The SQL column string
    */
   _column(field) {
-    var name = field.name;
-    var use = field.use;
-    var type = field.type;
-    var length = field.length;
-    var precision = field.precision;
-    var serial = field.serial;
-    var nil = field.null;
-    var dft = field['default'];
+    let use = field.use;
+    const name = field.name;
+    const type = field.type;
+    const length = field.length;
+    const precision = field.precision;
+    const serial = field.serial;
+    const nil = field.null;
 
     if (type === 'float' && precision) {
       use = 'numeric';
@@ -172,22 +169,19 @@ class PostgreSql extends Dialect {
       result.push('NOT NULL');
     } else {
       result.push(typeof nil === 'boolean' ? (nil ? 'NULL' : 'NOT NULL') : '');
+      let dft = field['default'];
       if (dft != null) {
+        let operator = ':value';
         if (dft.constructor === Object) {
-          var operator = Object.keys(dft)[0];
+          operator = Object.keys(dft)[0];
           dft = dft[operator];
-        } else {
-          operator = ':value';
         }
         result.push('DEFAULT ' + this.format(operator, dft, { field: field }));
       }
     }
 
     result.push(this.meta('column', field, ['comment']));
-    result = result.filter(function(value) {
-      return !!value;
-    });
-    return result.join(' ');
+    return result.filter(Boolean).join(' ');
   }
 }
 

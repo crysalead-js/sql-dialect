@@ -1,5 +1,5 @@
-var extend = require('extend-merge').extend;
-var Statement = require('../statement');
+'use strict'
+const Statement = require('../statement');
 
 /**
  * `UPDATE` statement.
@@ -13,22 +13,18 @@ class Update extends Statement {
   constructor(config) {
     super(config);
 
-    var defaults = {
-      schema: null
-    };
-    config = extend({}, defaults, config);
-
     /**
      * The schema.
      *
      * @var mixed
      */
-    this._schema = config.schema;
+    this._schema = config.schema || null;
 
     /**
      * The SQL parts.
      *
      * @var Object
+     * @TODO support FROM clause
      */
     this._parts = {
       flags    : new Map(),
