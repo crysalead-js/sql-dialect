@@ -1,6 +1,11 @@
-var extend = require('extend-merge').extend;
-var Statement = require('../statement');
+'use strict'
 
+const Statement = require('../statement');
+const FROM = 'FROM';
+const WHERE = 'WHERE';
+const LIMIT = 'LIMIT';
+const RETURNING = 'RETURNING';
+const DELETE = 'DELETE';
 /**
  * `DELETE` statement.
  */
@@ -13,19 +18,15 @@ class Delete extends Statement {
    * @param Object config The config array.
    */
   constructor(config) {
-    super(config);
-
-    var defaults = {
-      schema: null
-    };
-    config = extend({}, defaults, config);
+    const opts = Object.assign({}, { schema: null }, config);
+    super(opts);
 
     /**
      * The schema.
      *
      * @var mixed
      */
-    this._schema = config.schema;
+    this._schema = opts.schema;
 
     /**
      * The SQL parts.
@@ -63,15 +64,17 @@ class Delete extends Statement {
       throw new Error("Invalid `DELETE` statement, missing `FROM` clause.");
     }
 
-    return 'DELETE' +
+    const dialect = this.dialect();
+    return (DELETE +
       this._buildFlags(this._parts.flags) +
-      this._buildClause('FROM', this.dialect().names(this._parts.from)) +
-      this._buildClause('WHERE',  this.dialect().conditions(this._parts.where, {
+      this._buildClause(FROM, dialect.names(this._parts.from)) +
+      this._buildClause(WHERE,  dialect.conditions(this._parts.where, {
         schemas: { '': this._schema }
       })) +
       this._buildOrder() +
-      this._buildClause('LIMIT', this._parts.limit) +
-      this._buildClause('RETURNING', this.dialect().names(this._parts.returning));
+      this._buildClause(LIMIT, this._parts.limit) +
+      this._buildClause(RETURNING, dialect.names(this._parts.returning))
+     );
   }
 
 }

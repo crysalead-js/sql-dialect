@@ -1,4 +1,9 @@
-var Statement = require('../statement');
+'use strict'
+const Statement = require('../statement');
+
+const IF_EXISTS = 'IF EXISTS';
+const CASCADE = 'CASCADE';
+const RESTRICT = 'RESTRICT';
 
 /**
  * `DROP TABLE` statement.
@@ -42,8 +47,7 @@ class DropTable extends Statement {
    * @param  Array    table The table names.
    * @return Function       Returns `this`.
    */
-  table(table) {
-    var tables = Array.isArray(table) ? table : Array.prototype.slice.call(arguments);
+  table(...tables) {
     this._parts.table = tables;
     return this;
   }
@@ -54,8 +58,8 @@ class DropTable extends Statement {
    * @param  Boolean  cascade If `true` the related views or objects will be removed.
    * @return Function         Returns `this`.
    */
-  cascade(cascade) {
-    this._parts.cascade = cascade === undefined ? true : cascade;
+  cascade(cascade = true) {
+    this._parts.cascade = cascade;
     return this;
   }
 
@@ -65,8 +69,8 @@ class DropTable extends Statement {
    * @param  Boolean  restrict If `true` the table won't be removed if the related views or objects exists.
    * @return Function          Returns `this`.
    */
-  restrict(restrict) {
-    this._parts.restrict = restrict === undefined ? true : restrict;
+  restrict(restrict = true) {
+    this._parts.restrict = restrict;
     return this;
   }
 
@@ -81,10 +85,10 @@ class DropTable extends Statement {
     }
 
     return 'DROP TABLE' +
-      this._buildFlag('IF EXISTS', this._parts.ifExists) +
+      this._buildFlag(IF_EXISTS, this._parts.ifExists) +
       this._buildChunk(this.dialect().names(this._parts.table)) +
-      this._buildFlag('CASCADE', this._parts.cascade) +
-      this._buildFlag('RESTRICT', this._parts.restrict);
+      this._buildFlag(CASCADE, this._parts.cascade) +
+      this._buildFlag(RESTRICT, this._parts.restrict);
   }
 }
 
