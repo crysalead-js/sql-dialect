@@ -1,11 +1,11 @@
-var extend = require('extend-merge').extend;
-var Statement = require('../../statement');
+'use strict'
+
+const Statement = require('../../statement');
 
 /**
  * `TRUNCATE` statement.
  */
 class Truncate extends Statement {
-
 
   /**
    * Constructor.
@@ -15,17 +15,12 @@ class Truncate extends Statement {
   constructor(config) {
     super(config);
 
-    var defaults = {
-      schema: null
-    };
-    config = extend({}, defaults, config);
-
     /**
      * The schema.
      *
      * @var mixed
      */
-    this._schema = config.schema;
+    this._schema = config.schema || null;
 
     /**
      * The SQL parts.
@@ -55,7 +50,7 @@ class Truncate extends Statement {
    */
   toString() {
     if (!this._parts.table) {
-      throw new Error("Invalid `TRUNCATE` statement, missing `TABLE` clause.");
+      throw new Error('Invalid `TRUNCATE` statement, missing `TABLE` clause.');
     }
 
     return 'DELETE' + this._buildClause('FROM', this.dialect().names(this._parts.table)) + ';' +

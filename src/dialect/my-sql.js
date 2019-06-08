@@ -1,14 +1,15 @@
-var extend = require('extend-merge').extend;
-var merge = require('extend-merge').merge;
+'use strict'
+const {merge} = require('extend-merge');
 
-var Dialect = require('../dialect');
-var Select = require('../statement/mysql/select');
-var Insert = require('../statement/mysql/insert');
-var Update = require('../statement/mysql/update');
-var Delete = require('../statement/mysql/delete');
-var Truncate = require('../statement/truncate');
-var CreateTable = require('../statement/create-table');
-var DropTable = require('../statement/drop-table');
+const Dialect = require('../dialect');
+const Select = require('../statement/mysql/select');
+const Insert = require('../statement/mysql/insert');
+const Update = require('../statement/mysql/update');
+const Delete = require('../statement/mysql/delete');
+const Truncate = require('../statement/truncate');
+const CreateTable = require('../statement/create-table');
+const DropTable = require('../statement/drop-table');
+const BLOB_COLUMNS = new Set(['text', 'blob', 'geometry', 'json']);
 
 /**
  * MySQL dialect.
@@ -20,7 +21,7 @@ class MySql extends Dialect {
    * @param Object config The config array
    */
   constructor(config) {
-    var defaults = {
+    const opts = merge({
       classes: MySql._classes,
       operators: {
         '#'           : { format: '%s ^ %s' },
@@ -31,10 +32,8 @@ class MySql extends Dialect {
         ':minus'      : { builder: 'set' },
         ':except'     : { name: 'MINUS', builder: 'set' }
       }
-    };
-
-    var config = merge(defaults, config);
-    super(config);
+    }, config);
+    super(opts);
 
     /**
      * Escape identifier character.
@@ -140,44 +139,42 @@ class MySql extends Dialect {
    * @return String       The SQL column string
    */
   _column(field) {
-    var name = field.name;
-    var use = field.use;
-    var type = field.type;
-    var length = field.length;
-    var precision = field.precision;
-    var serial = field.serial;
-    var nil = field.null;
-    var dft = field['default'];
+    let use = field.use;
+    const nil = field.null;
+    const name = field.name;
+    const type = field.type;
+    const length = field.length;
+    const precision = field.precision;
+    const serial = field.serial;
 
     if (type === 'float' && precision) {
       use = 'decimal';
     }
 
-    var column = this.name(name) + ' ' + this._formatColumn(use, length, precision);
+    const column = this.name(name) + ' ' + this._formatColumn(use, length, precision);
+    const result = [
+      column,
+      this.meta('column', field, ['charset', 'collate'])
+    ];
 
-    var result = [column];
-    result.push(this.meta('column', field, ['charset', 'collate']));
 
     if (serial) {
       result.push('NOT NULL AUTO_INCREMENT');
     } else {
       result.push(typeof nil === 'boolean' ? (nil ? 'NULL' : 'NOT NULL') : '');
-      if (dft != null && ['text', 'blob', 'geometry', 'json'].indexOf(use.toLowerCase()) === -1) {
+      let dft = field['default'];
+      if (dft != null && !BLOB_COLUMNS.has(use.toLowerCase())) {
+        let operator = ':value';
         if (dft.constructor === Object) {
-          var operator = Object.keys(dft)[0];
+          operator = Object.keys(dft)[0];
           dft = dft[operator];
-        } else {
-          operator = ':value';
         }
         result.push('DEFAULT ' + this.format(operator, dft, { field: field }));
       }
     }
 
     result.push(this.meta('column', field, ['comment']));
-    result = result.filter(function(value) {
-      return !!value;
-    });
-    return result.join(' ');
+    return result.filter(Boolean).join(' ');
   }
 }
 

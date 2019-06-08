@@ -1,9 +1,8 @@
-var BaseSelect = require('../select');
+'use strict'
+
+const BaseSelect = require('../select');
 
 /**
  * `SELECT` statement.
  */
-class Select extends BaseSelect {
-}
-
-module.exports = Select;
+module.exports = BaseSelect;

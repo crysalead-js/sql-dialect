@@ -1,4 +1,6 @@
-var BaseUpdate = require('../update');
+'use strict'
+
+const BaseUpdate = require('../update');
 
 /**
  * `UPDATE` statement.
@@ -11,9 +13,12 @@ class Update extends BaseUpdate {
    * @return Function            Returns `this`.
    */
   returning(fields) {
-    var fields = Array.isArray(fields) && arguments.length === 1 ? fields : Array.prototype.slice.call(arguments);
-    if (fields.length) {
-      this._parts.returning = this._parts.returning.concat(fields);
+    if (!fields) {
+      return this;
+    }
+    const arr = Array.isArray(fields) ? fields : [fields]
+    if (arr.length) {
+      this._parts.returning.push(...arr);
     }
     return this;
   }

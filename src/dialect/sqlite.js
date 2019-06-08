@@ -1,14 +1,14 @@
-var extend = require('extend-merge').extend;
-var merge = require('extend-merge').merge;
+'use strict'
+const {merge} = require('extend-merge');
 
-var Dialect = require('../dialect');
-var Select = require('../statement/sqlite/select');
-var Insert = require('../statement/sqlite/insert');
-var Update = require('../statement/sqlite/update');
-var Delete = require('../statement/sqlite/delete');
-var Truncate = require('../statement/sqlite/truncate');
-var CreateTable = require('../statement/create-table');
-var DropTable = require('../statement/drop-table');
+const Dialect = require('../dialect');
+const Select = require('../statement/sqlite/select');
+const Insert = require('../statement/sqlite/insert');
+const Update = require('../statement/sqlite/update');
+const Delete = require('../statement/sqlite/delete');
+const Truncate = require('../statement/sqlite/truncate');
+const CreateTable = require('../statement/create-table');
+const DropTable = require('../statement/drop-table');
 
 /**
  * Sqlite dialect.
@@ -20,7 +20,7 @@ class Sqlite extends Dialect {
    * @param Object config The config array
    */
   constructor(config) {
-    var defaults = {
+    const opts = merge({}, {
       classes: Sqlite._classes,
       operators: {
         // Algebraic operations
@@ -28,10 +28,8 @@ class Sqlite extends Dialect {
         ':union all'  : { builder: 'set' },
         ':except'     : { builder: 'set' }
       }
-    };
-
-    var config = merge(defaults, config);
-    super(config);
+    }, config);
+    super(opts);
 
     /**
      * Escape identifier character.
@@ -103,43 +101,39 @@ class Sqlite extends Dialect {
    * @return String       The SQL column string
    */
   _column(field) {
-    var name = field.name;
-    var use = field.use;
-    var type = field.type;
-    var length = field.length;
-    var precision = field.precision;
-    var serial = field.serial;
-    var nil = field.null;
-    var dft = field['default'];
+    let use = field.use;
+    const name = field.name;
+    const type = field.type;
+    const length = field.length;
+    const precision = field.precision;
+    const serial = field.serial;
+    const nil = field.null;
 
     if (type === 'float' && precision) {
       use = 'numeric';
     }
 
-    var column = this.name(name) + ' ' + this._formatColumn(use, length, precision);
-
-    var result = [column];
-    result.push(this.meta('column', field, ['collate']));
+    const column = this.name(name) + ' ' + this._formatColumn(use, length, precision);
+    const result = [
+      column,
+      this.meta('column', field, ['collate'])
+    ];
 
     if (serial) {
       result.push('NOT NULL');
     } else {
       result.push(typeof nil === 'boolean' ? (nil ? 'NULL' : 'NOT NULL') : '');
+      let dft = field['default'];
+      let operator = ':value';
       if (dft != null) {
         if (dft.constructor === Object) {
-          var operator = Object.keys(dft)[0];
+          operator = Object.keys(dft)[0];
           dft = dft[operator];
-        } else {
-          operator = ':value';
         }
         result.push('DEFAULT ' + this.format(operator, dft, { field: field }));
       }
     }
-
-    result = result.filter(function(value) {
-      return !!value;
-    });
-    return result.join(' ');
+    return result.filter(Boolean).join(' ');
   }
 }
 

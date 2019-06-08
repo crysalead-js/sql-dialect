@@ -1,4 +1,5 @@
-var BaseDelete = require('../delete');
+'use strict'
+const BaseDelete = require('../delete');
 
 /**
  * `DELETE` statement.
@@ -11,9 +12,11 @@ class Delete extends BaseDelete {
    * @return Function            Returns `this`.
    */
   returning(fields) {
-    var fields = Array.isArray(fields) && arguments.length === 1 ? fields : Array.prototype.slice.call(arguments);
-    if (fields.length) {
-      this._parts.returning = this._parts.returning.concat(fields);
+    const arr = Array.isArray(fields) && arguments.length === 1
+      ? fields
+      : Array.prototype.slice.call(arguments);
+    if (fields) {
+      this._parts.returning.push(...arr);
     }
     return this;
   }

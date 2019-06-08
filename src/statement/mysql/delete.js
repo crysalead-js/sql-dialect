@@ -1,5 +1,9 @@
-var BaseDelete = require('../delete');
+'use strict'
 
+const BaseDelete = require('../delete');
+const LOW_PRIORITY = 'LOW_PRIORITY';
+const IGNORE = 'IGNORE';
+const QUICK = 'QUICK';
 /**
  * `DELETE` statement.
  */
@@ -11,7 +15,7 @@ class Delete extends BaseDelete {
    * @return Function        Returns `this`.
    */
   lowPriority(enable) {
-    this.setFlag('LOW_PRIORITY', enable === undefined ? true : enable);
+    this.setFlag(LOW_PRIORITY, enable === undefined ? true : enable);
     return this;
   }
 
@@ -23,7 +27,7 @@ class Delete extends BaseDelete {
    */
   ignore(enable)
   {
-    this.setFlag('IGNORE', enable === undefined ? true : enable);
+    this.setFlag(IGNORE, enable === undefined ? true : enable);
     return this;
   }
 
@@ -34,7 +38,7 @@ class Delete extends BaseDelete {
    * @return Function        Returns `this`.
    */
   quick(enable) {
-    this.setFlag('QUICK', enable === undefined ? true : enable);
+    this.setFlag(QUICK, enable === undefined ? true : enable);
     return this;
   }
 }
