@@ -28,6 +28,7 @@ class Statement {
     this._parts = {
       flags: new Map(),
       where: [],
+      with: new Map(),
       order: new Map(),
       limit: ''
     };
@@ -102,6 +103,25 @@ class Statement {
     const args = Array.isArray(conditions) ? conditions : [conditions];
     if (args.length) {
       this._parts.where.push(args);
+    }
+    return this;
+  }
+
+  with(queries) {
+    if (!queries) {
+      return this;
+    }
+
+    const args = Array.isArray(queries) ? queries : [queries];
+    for (const query of args) {
+      const name = Object.keys(query)[0];
+      if (this._parts.with.has(name)) {
+        const error = new Error(
+          `Common table expression ${name} specified more than onece`
+        );
+        throw error;
+      }
+      this._parts.with.set(name, query[name]);
     }
     return this;
   }
@@ -232,6 +252,19 @@ class Statement {
     }
 
     return this._buildClause('ORDER BY', result.join(', '));
+  }
+
+  _buildCTE() {
+    if (!this._parts.with.size) {
+      return '';
+    }
+    const queries = [];
+    for (const [name, query] of this._parts.with.entries()) {
+      queries.push(
+        `${name} AS (${query.toString()})`
+      )
+    }
+    return this._buildClause('WITH', queries.join(', '), ' ')
   }
 
 }

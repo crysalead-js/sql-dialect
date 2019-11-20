@@ -30,6 +30,7 @@ class Select extends Statement {
       from     : [],
       joins    : [],
       where    : [],
+      with     : new Map(),
       group    : new Map(),
       having   : [],
       order    : new Map(),
@@ -191,7 +192,8 @@ class Select extends Statement {
     const dialect = this.dialect()
     const fields = dialect.names(this._parts.fields);
     const opts = { schemas: schemas, aliases: aliases }
-    var sql = 'SELECT' +
+    var sql = this._buildCTE() +
+      'SELECT' +
       this._buildFlags(this._parts.flags) +
       this._buildChunk(fields ? fields : '*') +
       this._buildClause('FROM', dialect.names(this._parts.from)) +

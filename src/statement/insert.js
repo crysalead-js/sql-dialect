@@ -30,6 +30,7 @@ class Insert extends Statement {
       flags     : new Map(),
       into      : '',
       values    : [],
+      with      : new Map(),
       returning : []
     }
   }
@@ -71,6 +72,7 @@ class Insert extends Statement {
     const dialect = this.dialect();
 
     return [
+      this._buildCTE(),
       'INSERT',
       this._buildFlags(this._parts.flags),
       this._buildClause('INTO', dialect.name(this._parts.into, true)),
