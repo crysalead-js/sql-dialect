@@ -67,6 +67,49 @@ describe("Insert", function() {
 
   });
 
+  describe(".with()", function() {
+    it('accepts a single query', function() {
+      this.insert
+        .with({'foo': this.dialect.statement('insert').into('table_a').values({a: 'b'}) })
+        .into('table')
+        .values({
+          field1: 'value1',
+          field2: 'value2'
+        })
+      expect(this.insert.toString()).toBe('WITH foo AS (INSERT INTO "table_a" ("a") VALUES (\'b\'))INSERT INTO "table" ("field1", "field2") VALUES (\'value1\', \'value2\')');
+    })
+    it('accepts multiple query single query', function() {
+      this.insert
+        .with({
+          'foo': this.dialect.statement('insert').into('table_a').values({a: 'b'}),
+          'bar': this.dialect.statement('insert').into('table_b').values({a: 'b'})
+        })
+        .into('table')
+        .values({
+          field1: 'value1',
+          field2: 'value2'
+        })
+      expect(this.insert.toString()).toBe('WITH foo AS (INSERT INTO "table_a" ("a") VALUES (\'b\')), bar AS (INSERT INTO "table_b" ("a") VALUES (\'b\'))INSERT INTO "table" ("field1", "field2") VALUES (\'value1\', \'value2\')');
+    })
+
+    it('throws with duplicate names', function() {
+      expect(function(){
+        this.insert
+          .with({
+            'foo': this.dialect.statement('insert').into('foo').values({a: 'b'})
+          })
+          .with({
+            'foo': this.dialect.statement('insert').into('foo').values({a: 'b'})
+          })
+          .into('table')
+          .values({
+            field1: 'value1',
+            field2: 'value2'
+          });
+      }.bind(this)).toThrow(new Error("Common table expression foo specified more than once"));
+    });
+  });
+
   describe(".toString()" , function() {
 
     it("casts object to string query", function() {

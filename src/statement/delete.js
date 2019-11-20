@@ -11,7 +11,6 @@ const DELETE = 'DELETE';
  */
 class Delete extends Statement {
 
-
   /**
    * Constructor.
    *
@@ -37,6 +36,7 @@ class Delete extends Statement {
       flags    : new Map(),
       from     : '',
       where    : [],
+      with     : new Map(),
       order    : new Map(),
       limit    : '',
       returning: []
@@ -65,16 +65,18 @@ class Delete extends Statement {
     }
 
     const dialect = this.dialect();
-    return (DELETE +
-      this._buildFlags(this._parts.flags) +
-      this._buildClause(FROM, dialect.names(this._parts.from)) +
+    return [
+      this._buildCTE(),
+      DELETE,
+      this._buildFlags(this._parts.flags),
+      this._buildClause(FROM, dialect.names(this._parts.from)),
       this._buildClause(WHERE,  dialect.conditions(this._parts.where, {
         schemas: { '': this._schema }
-      })) +
-      this._buildOrder() +
-      this._buildClause(LIMIT, this._parts.limit) +
+      })),
+      this._buildOrder(),
+      this._buildClause(LIMIT, this._parts.limit),
       this._buildClause(RETURNING, dialect.names(this._parts.returning))
-     );
+    ].join('');
   }
 
 }
