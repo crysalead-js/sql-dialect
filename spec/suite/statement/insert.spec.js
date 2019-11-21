@@ -76,7 +76,7 @@ describe("Insert", function() {
           field1: 'value1',
           field2: 'value2'
         })
-      expect(this.insert.toString()).toBe('WITH foo AS (INSERT INTO "table_a" ("a") VALUES (\'b\'))INSERT INTO "table" ("field1", "field2") VALUES (\'value1\', \'value2\')');
+      expect(this.insert.toString()).toBe('WITH foo AS (INSERT INTO "table_a" ("a") VALUES (\'b\')) INSERT INTO "table" ("field1", "field2") VALUES (\'value1\', \'value2\')');
     })
     it('accepts multiple query single query', function() {
       this.insert
@@ -89,7 +89,7 @@ describe("Insert", function() {
           field1: 'value1',
           field2: 'value2'
         })
-      expect(this.insert.toString()).toBe('WITH foo AS (INSERT INTO "table_a" ("a") VALUES (\'b\')), bar AS (INSERT INTO "table_b" ("a") VALUES (\'b\'))INSERT INTO "table" ("field1", "field2") VALUES (\'value1\', \'value2\')');
+      expect(this.insert.toString()).toBe('WITH foo AS (INSERT INTO "table_a" ("a") VALUES (\'b\')), bar AS (INSERT INTO "table_b" ("a") VALUES (\'b\')) INSERT INTO "table" ("field1", "field2") VALUES (\'value1\', \'value2\')');
     })
 
     it('throws with duplicate names', function() {

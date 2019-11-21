@@ -218,7 +218,7 @@ describe("Update", function() {
         .with({'foo': this.dialect.statement('insert').into('table_a').values({a: 'b'}) })
         .table('table')
         .values({ field: 'value' });
-      expect(this.update.toString()).toBe('WITH foo AS (INSERT INTO "table_a" ("a") VALUES (\'b\'))UPDATE "table" SET "field" = \'value\'');
+      expect(this.update.toString()).toBe('WITH foo AS (INSERT INTO "table_a" ("a") VALUES (\'b\')) UPDATE "table" SET "field" = \'value\'');
     });
     it('accepts multiple query single query', function() {
       this.update
@@ -229,7 +229,7 @@ describe("Update", function() {
         .table('table')
         .values({ field: 'value' })
         .where({ '=': [1, 1]});
-      expect(this.update.toString()).toBe('WITH foo AS (INSERT INTO "table_a" ("a") VALUES (\'b\')), bar AS (INSERT INTO "table_b" ("a") VALUES (\'b\'))UPDATE "table" SET "field" = \'value\' WHERE 1 = 1');
+      expect(this.update.toString()).toBe('WITH foo AS (INSERT INTO "table_a" ("a") VALUES (\'b\')), bar AS (INSERT INTO "table_b" ("a") VALUES (\'b\')) UPDATE "table" SET "field" = \'value\' WHERE 1 = 1');
     });
 
     it('throws with duplicate names', function() {

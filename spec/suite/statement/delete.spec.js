@@ -149,8 +149,9 @@ describe("Delete", function() {
       this.delete
         .with({'foo': this.dialect.statement('insert').into('table_a').values({a: 'b'}) })
         .from('table')
-      expect(this.delete.toString()).toBe('WITH foo AS (INSERT INTO "table_a" ("a") VALUES (\'b\'))DELETE FROM "table"');
+      expect(this.delete.toString()).toBe('WITH foo AS (INSERT INTO "table_a" ("a") VALUES (\'b\')) DELETE FROM "table"');
     });
+
     it('accepts multiple query single query', function() {
       this.delete
         .with({
@@ -159,7 +160,7 @@ describe("Delete", function() {
         })
         .from('table')
         .where({ '=': [1, 1]})
-      expect(this.delete.toString()).toBe('WITH foo AS (INSERT INTO "table_a" ("a") VALUES (\'b\')), bar AS (INSERT INTO "table_b" ("a") VALUES (\'b\'))DELETE FROM "table" WHERE 1 = 1');
+      expect(this.delete.toString()).toBe('WITH foo AS (INSERT INTO "table_a" ("a") VALUES (\'b\')), bar AS (INSERT INTO "table_b" ("a") VALUES (\'b\')) DELETE FROM "table" WHERE 1 = 1');
     });
 
     it('throws with duplicate names', function() {

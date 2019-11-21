@@ -249,7 +249,7 @@ class Statement {
   _buildOrder(aliases) {
     const result = [];
     const orderby = this._parts.order;
-    const dialect = this.dialect()
+    const dialect = this.dialect();
 
     for(const [column, dir] of orderby.entries()){
       result.push(dialect.name(column, aliases) + ' ' + dir);
@@ -266,9 +266,9 @@ class Statement {
     for (const [name, query] of this._parts.with.entries()) {
       queries.push(
         `${name} AS (${query.toString()})`
-      )
+      );
     }
-    return this._buildClause('WITH', queries.join(', ')).trim()
+    return this._buildClause('WITH', queries.join(', ')).trim() + ' ';
   }
 
 }

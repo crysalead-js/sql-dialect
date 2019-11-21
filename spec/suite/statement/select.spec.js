@@ -416,7 +416,7 @@ describe("Select", function() {
       this.select
         .with({'foo': this.dialect.statement('insert').into('table_a').values({a: 'b'}) })
         .from('table')
-      expect(this.select.toString()).toBe('WITH foo AS (INSERT INTO "table_a" ("a") VALUES (\'b\'))SELECT * FROM "table"');
+      expect(this.select.toString()).toBe('WITH foo AS (INSERT INTO "table_a" ("a") VALUES (\'b\')) SELECT * FROM "table"');
     })
     it('accepts multiple query single query', function() {
       this.select
@@ -425,7 +425,7 @@ describe("Select", function() {
           'bar': this.dialect.statement('insert').into('table_b').values({a: 'b'})
         })
         .from('table')
-      expect(this.select.toString()).toBe('WITH foo AS (INSERT INTO "table_a" ("a") VALUES (\'b\')), bar AS (INSERT INTO "table_b" ("a") VALUES (\'b\'))SELECT * FROM "table"');
+      expect(this.select.toString()).toBe('WITH foo AS (INSERT INTO "table_a" ("a") VALUES (\'b\')), bar AS (INSERT INTO "table_b" ("a") VALUES (\'b\')) SELECT * FROM "table"');
     })
 
     it('throws with duplicate names', function() {
