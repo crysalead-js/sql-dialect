@@ -28,6 +28,7 @@ class Statement {
     this._parts = {
       flags: new Map(),
       where: [],
+      with: new Map(),
       order: new Map(),
       limit: ''
     };
@@ -102,6 +103,29 @@ class Statement {
     const args = Array.isArray(conditions) ? conditions : [conditions];
     if (args.length) {
       this._parts.where.push(args);
+    }
+    return this;
+  }
+
+  /**
+   * Adds additional queries to be executed as named common table expressions
+   *
+   * @param {Object} queries an object mapping a names to queries
+   * @return Object                   Returns `this`.
+   */
+  with(queries) {
+    if (!queries) {
+      return this;
+    }
+
+    for (const name of Object.keys(queries)) {
+      if (this._parts.with.has(name)) {
+        const error = new Error(
+          `Common table expression ${name} specified more than once`
+        );
+        throw error;
+      }
+      this._parts.with.set(name, queries[name]);
     }
     return this;
   }
@@ -225,13 +249,26 @@ class Statement {
   _buildOrder(aliases) {
     const result = [];
     const orderby = this._parts.order;
-    const dialect = this.dialect()
+    const dialect = this.dialect();
 
     for(const [column, dir] of orderby.entries()){
       result.push(dialect.name(column, aliases) + ' ' + dir);
     }
 
     return this._buildClause('ORDER BY', result.join(', '));
+  }
+
+  _buildCTE() {
+    if (!this._parts.with.size) {
+      return '';
+    }
+    const queries = [];
+    for (const [name, query] of this._parts.with.entries()) {
+      queries.push(
+        `${name} AS (${query.toString()})`
+      );
+    }
+    return this._buildClause('WITH', queries.join(', ')).trim() + ' ';
   }
 
 }

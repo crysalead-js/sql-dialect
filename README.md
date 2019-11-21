@@ -37,7 +37,7 @@ var SQL = require('sql-dialect');
 var dialect = new SQL.MySql();
 ```
 
-Once instantiated, it's possible to use the dialect`s `.statement()` method to create query instances like in the following:
+Once instantiated, it's possible to use the dialect's `.statement()` method to create query instances like in the following:
 
 ```js
 var select = dialect.statement('select');
@@ -49,12 +49,12 @@ var createTable = dialect.statement('create table');
 var dropTable = dialect.statement('drop table');
 ```
 
-Then to generate the corresponding SQL, we need to use either `toString()` or `__toString()`:
+Then to generate the corresponding SQL, we need to use either `toString()`:
 
 ```js
 select.from('mytable');
-echo select.toString(); // SELECT * FROM "mytable"
-echo String(select);    // SELECT * FROM "mytable"
+console.log(select.toString()); // SELECT * FROM "mytable"
+console.log(String(select));    // SELECT * FROM "mytable"
 ```
 
 Since the SQL generated is independent of any particular database connection library so you can any other database connection library of your choice, to execute the query.
@@ -104,7 +104,6 @@ select
   .order('bar')                 // ORDER BY
   .limit(10, 40)                // LIMIT AND OFFSET AS SECOND PARAMETER
   .forUpdate()                  // FOR UPDATE
-?>
 ```
 
 #### Prefix Notation (or polish notation)
@@ -121,12 +120,12 @@ So to be able to build complex queries without being limitated by the API, this 
 select.fields({ '*': [
   { '+': [1, 2] }, 3
 ] });
-echo select.toString();            // SELECT 1 + 2 * 3
+console.log(select.toString());            // SELECT 1 + 2 * 3
 
 select.fields({ '*': [
   { ':()': { '+': [1, 2] } }, 3
 ] });
-echo select.toString();            // SELECT (1 + 2) * 3
+console.log(select.toString());            // SELECT (1 + 2) * 3
 ```
 
 You probably had to read the example twice. But if it looks quite confusing at a first glance, prefix notation has a couple of advantages:*
@@ -157,7 +156,7 @@ select.from('table').where([
   { field1: 'value1' },
   { field2: 'value2' }
 ]);
-echo select.toString();
+console.log(select.toString());
 // SELECT * FROM `table` WHERE `field1` = 'value1' AND `field2` = 'value2'
 ```
 
@@ -230,15 +229,26 @@ Bellow an exhaustive list of common operators which work for both MySQL and Post
 * `':or'`
 * `':xor'`
 * `'()'`
-`
+
 It's also possible to use some "free" operators. All used operators which are not present in the list above will be considered as SQL functions like `:concat`, `:sum`, `:min`, `:max`, etc. and will be generated as `FUNCTION(...)`.
 
+For example:
+
+```js
+select
+  .fields([
+    {':sum()': [{':name': 'x'}, 2])
+  ])
+  .from('table')
+
+// SELECT SUM("x", 2) from "table"
+```
 #### MySQL Dedicated Operators
 
 * `'#'`
 * `':regex'`
 * `':rlike'`
-* `':sounds li`ke'
+* `':sounds like'`
 * `':union'`
 * `':union all`'
 * `':minus'`
@@ -309,7 +319,7 @@ subquery.from('table2').alias('t2');
 
 select.from('table').join($subquery);
 
-echo select.toString();
+select.toString();
 // SELECT * FROM "table" LEFT JOIN (SELECT * FROM "table2") AS "t2"
 ```
 
@@ -319,7 +329,7 @@ Example of `UNION` query:
 var select1 = dialect.statement('select').from('table1');
 var select2 = dialect.statement('select').from('table2');
 
-echo dialect.conditions([
+dialect.conditions([
   { ':union': [select1, select2] }
 ]);
 // SELECT * FROM `table1` UNION SELECT * FROM `table2`
@@ -340,6 +350,43 @@ insert.into('table')               // INTO
 
 The `values()` method allows you to pass an object of key-value pairs where the key is the field name and value the field value.
 
+#### Common Table Expressions
+
+To use common table expressions, you use the `with` function on any statement instance (`INSERT`, `UPDATE`, `DELETE` `SELECT`).
+Pass an object mapping key names to any other query
+
+```js
+
+var update = dialect
+  .statement('update')
+  .table('foo')
+  .values([
+    { field1: 'value1' },
+    { field2: 'value2' }
+  ])
+  .where({ id: 123 })
+  .returning(['id']);
+
+select
+  .with({foo_cte: update})
+  .from('table')
+  .join('foo', [
+    {'foo_cte.id': {':name': 'table.foo_id'}}
+  ], 'LEFT');
+
+select.toString();
+// WITH foo_cte AS (
+//   UPDATE foo
+//   SET
+//      "field1" = 'value1',
+//      "field2" = 'value2'
+//    WHERE "id" = '123'
+//    RETURNING id
+//  )
+// SELECT *
+// FROM "table"
+//  LEFT JOIN "foo_cte"."id" ON "foo_cte"."id" = "table"."foo_id"
+```
 ### UPDATE
 
 Example of `UPDATE` query:
@@ -436,7 +483,7 @@ createTable
       }
     ]);
 
-echo this.create.toString();
+this.create.toString();
 // CREATE TABLE `table` (
 // `id` int NOT NULL AUTO_INCREMENT,
 // `table_id` int,
@@ -477,7 +524,7 @@ createTable.table('table')
              { id:  { type: 'serial' } }
            ]);
 
-echo this.create.toString();
+this.create.toString();
 // CREATE TABLE `table` (`id` int NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`))
 ```
 
@@ -490,7 +537,7 @@ createTable.table('table')
              { id:  { type: 'serial' } }
            ]);
 
-echo this.create.toString();
+this.create.toString();
 // CREATE TABLE "table" ("id" serial NOT NULL, PRIMARY KEY ("id"))
 ```
 
@@ -521,8 +568,8 @@ Example:
 dialect.map('tinyint', 'boolean', { length: 1 });
 dialect.map('tinyint', 'integer');
 
-echo dialect.mapped('tinyint'); // integer
-echo dialect.mapped({           // boolean
+dialect.mapped('tinyint'); // integer
+dialect.mapped({           // boolean
   use: 'tinyint'
   length: 1
 });

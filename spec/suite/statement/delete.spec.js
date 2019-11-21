@@ -144,6 +144,39 @@ describe("Delete", function() {
 
   });
 
+  describe(".with()", function() {
+    it('accepts a single query', function() {
+      this.delete
+        .with({'foo': this.dialect.statement('insert').into('table_a').values({a: 'b'}) })
+        .from('table')
+      expect(this.delete.toString()).toBe('WITH foo AS (INSERT INTO "table_a" ("a") VALUES (\'b\')) DELETE FROM "table"');
+    });
+
+    it('accepts multiple query single query', function() {
+      this.delete
+        .with({
+          'foo': this.dialect.statement('insert').into('table_a').values({a: 'b'}),
+          'bar': this.dialect.statement('insert').into('table_b').values({a: 'b'})
+        })
+        .from('table')
+        .where({ '=': [1, 1]})
+      expect(this.delete.toString()).toBe('WITH foo AS (INSERT INTO "table_a" ("a") VALUES (\'b\')), bar AS (INSERT INTO "table_b" ("a") VALUES (\'b\')) DELETE FROM "table" WHERE 1 = 1');
+    });
+
+    it('throws with duplicate names', function() {
+      expect(function(){
+        this.delete
+          .with({
+            'foo': this.dialect.statement('insert').into('foo').values({a: 'b'}),
+          })
+          .with({
+            'foo': this.dialect.statement('insert').into('foo').values({a: 'b'}),
+          })
+          .from('table')
+      }.bind(this)).toThrow(new Error("Common table expression foo specified more than once"));
+    });
+  });
+
   describe(".toString()" , function() {
 
     it("casts object to string query", function() {

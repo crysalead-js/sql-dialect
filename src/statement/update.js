@@ -31,6 +31,7 @@ class Update extends Statement {
       table    : '',
       values   : {},
       where    : [],
+      with     : new Map(),
       order    : new Map(),
       limit    : '',
       forUpdate: false,
@@ -74,16 +75,19 @@ class Update extends Statement {
       throw new Error("Invalid `UPDATE` statement, missing `VALUES` clause.");
     }
 
-    return 'UPDATE' +
-      this._buildFlags(this._parts.flags) +
-      this._buildChunk(this.dialect().names(this._parts.table)) +
-      this._buildSet() +
+    return [
+      this._buildCTE(),
+      'UPDATE',
+      this._buildFlags(this._parts.flags),
+      this._buildChunk(this.dialect().names(this._parts.table)),
+      this._buildSet(),
       this._buildClause('WHERE',  this.dialect().conditions(this._parts.where, { schemas: {
         '': this._schema
-      }})) +
-      this._buildOrder() +
-      this._buildClause('LIMIT', this._parts.limit) +
-      this._buildClause('RETURNING', this.dialect().names(this._parts.returning));
+      }})),
+      this._buildOrder(),
+      this._buildClause('LIMIT', this._parts.limit),
+      this._buildClause('RETURNING', this.dialect().names(this._parts.returning))
+    ].join('');
   }
 
   /**
