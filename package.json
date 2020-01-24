@@ -1,6 +1,6 @@
 {
   "name": "sql-dialect",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "description": "SQL Builder",
   "license": "MIT",
   "repository": {
@@ -16,11 +16,11 @@
   },
   "main": "src/index.js",
   "devDependencies": {
-    "chai-kahlan": "^2.0.0",
-    "coveralls": "^3.0.8",
-    "jasmine-kahlan": "^1.0.2",
-    "mocha": "^6.2.2",
-    "nyc": "^14.1.1"
+    "chai-kahlan": "2.0.0",
+    "coveralls": "3.0.9",
+    "jasmine-kahlan": "1.0.2",
+    "mocha": "7.0.0",
+    "nyc": "15.0.0"
   },
   "scripts": {
     "coverage-report": "nyc --reporter=lcov mocha",
