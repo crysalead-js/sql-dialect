@@ -735,6 +735,17 @@ class Dialect {
     if (quoter) {
       return quoter(string);
     }
+    return this.addSlashes(string, "'");
+  }
+
+  /**
+   * Add slashes to a string.
+   *
+   * @param  String string    The string to add slashes.
+   * @param  String delimiter The delimiter.
+   * @return String           The string with slashes.
+   */
+  addSlashes(string, delimiter = '') {
     var str = String(string).replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g, function(c) {
       switch (c) {
         case '\0':
@@ -756,17 +767,18 @@ class Dialect {
           return '\\' + c;
       }
     });
-    return "'" + str + "'";
+    return delimiter + str + delimiter;
   }
 
   /**
    * Converts a given value into the proper type based on a given schema definition.
    *
-   * @param  mixed  value  The value to be converted. Arrays will be recursively converted.
-   * @param  Object states The current states.
-   * @return mixed         The formatted value.
+   * @param  mixed   value             The value to be converted. Arrays will be recursively converted.
+   * @param  Object  states            The current states.
+   * @param  Boolean doubleQuoteString Whether to double quote strings or not.
+   * @return mixed                     The formatted value.
    */
-  value(value, states) {
+  value(value, states, doubleQuoteString = false) {
     const caster = this.caster();
     if (caster) {
       return caster(value, states);
@@ -777,7 +789,7 @@ class Dialect {
       case typeof value === 'boolean':
         return value ? 'TRUE' : 'FALSE';
       case typeof value === 'string':
-        return this.quote(value);
+        return doubleQuoteString ? this.addSlashes(value, '"').replace(/[\\]/g, '\\\\') : this.quote(value);
       case Array.isArray(value):
         const cast = (value) => {
           const result = [];
@@ -785,12 +797,12 @@ class Dialect {
             if (Array.isArray(element)) {
               result.push(cast(element));
             } else {
-              result.push(this.value(element, states));
+              result.push(this.value(element, states, true));
             }
           }
           return '{' + result.join(',') + '}';
         };
-        return cast(value);
+        return "'" + cast(value) + "'";
     }
     return String(value);
   }
