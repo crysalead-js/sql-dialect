@@ -747,7 +747,7 @@ class Dialect {
    * @return String           The string with slashes.
    */
   addSlashes(string, delimiter = '') {
-    var str = String(string).replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g, function(c) {
+    var str = String(string).replace(/[\0\x08\x09\x1a\n\r"'\\]/g, function(c) {
       switch (c) {
         case '\0':
           return '\\0';
@@ -764,7 +764,6 @@ class Dialect {
         case '"':
         case '\'':
         case '\\':
-        case '%':
           return '\\' + c;
       }
     });
