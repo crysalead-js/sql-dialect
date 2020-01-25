@@ -445,7 +445,8 @@ class Dialect {
           } else {
             let alias = this.name(value[key]);
             name = this.name(key, aliases);
-            name = name !== value ? name + ' AS ' + alias : name;
+            const val = this.name(value[key]);
+            name = name !== val ? name + ' AS ' + val : name;
             name = prefix ? prefix + '.' + name : name;
             sql.set(name, name);
           }

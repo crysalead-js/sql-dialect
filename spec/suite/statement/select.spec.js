@@ -345,10 +345,17 @@ describe("Select", function() {
 
     });
 
-    it("support aliases", function() {
+    it("supports aliases", function() {
 
       this.select.from({ Table: 'table' }).order('table.field');
       expect(this.select.toString({}, { table: 'Table' })).toBe('SELECT * FROM "Table" AS "table" ORDER BY "Table"."field" ASC');
+
+    });
+
+    it("ignores aliases of the same name", function() {
+
+      this.select.from({ Table: 'Table' }).order('table.field');
+      expect(this.select.toString({}, { table: 'Table' })).toBe('SELECT * FROM "Table" ORDER BY "Table"."field" ASC');
 
     });
 
