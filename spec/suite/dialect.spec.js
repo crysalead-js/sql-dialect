@@ -454,6 +454,17 @@ describe("Dialect", function() {
 
     });
 
+    it("generates a subquery EXISTS expression", function() {
+      var subquery = this.dialect.statement('select');
+      subquery.fields('s1').from('t1');
+      var part = this.dialect.conditions({
+        ':exists': subquery
+      })
+
+      expect(part).toBe('EXISTS (SELECT "s1" FROM "t1")')
+    })
+
+
     it("generates a subquery ANY expression with a subquery instance", function() {
 
       var subquery = this.dialect.statement('select');
