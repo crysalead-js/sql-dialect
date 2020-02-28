@@ -167,8 +167,8 @@ class Dialect {
       ':not between' : { builder: 'between' },
       ':in'          : { builder: 'list' },
       ':not in'      : { builder: 'list' },
-      ':exists'      : { builder: 'list' },
-      ':not exists'  : { builder: 'list' },
+      ':exists'      : { builder: 'subquery' },
+      ':not exists'  : { builder: 'subquery' },
       ':all'         : { builder: 'list' },
       ':any'         : { builder: 'list' },
       ':some'        : { builder: 'list' },
@@ -207,6 +207,9 @@ class Dialect {
       },
       'alias': function (operator, parts) {
         return '(' + parts.shift() + ') ' + operator + ' ' + parts.shift();
+      },
+      'subquery': function(operator, parts) {
+        return `${operator} (${String(parts[0])})`
       }
     };
   }

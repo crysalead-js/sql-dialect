@@ -290,8 +290,8 @@ Example:
 ```js
 var dialect = new SQL.PostgreSql({
   builders: {
-    braces: function ($operator, $parts) {
-      return "{" . array_shift($parts)  ."}";
+    braces: function (operator, parts) {
+      return `{${parts.join(',')}}`;
     }
   },
   operators: {
@@ -317,7 +317,7 @@ Example of `JOIN` on a subquery:
 var subquery = dialect.statement('select')
 subquery.from('table2').alias('t2');
 
-select.from('table').join($subquery);
+select.from('table').join(subquery);
 
 select.toString();
 // SELECT * FROM "table" LEFT JOIN (SELECT * FROM "table2") AS "t2"
