@@ -1,6 +1,6 @@
 # sql-dialect
 
-[![Build Status](https://travis-ci.org/crysalead-js/sql-dialect.png?branch=master)](https://travis-ci.org/crysalead-js/sql-dialect)
+[![Build Status](https://travis-ci.com/crysalead-js/sql-dialect.png?branch=master)](https://travis-ci.com/crysalead-js/sql-dialect)
 [![Coverage Status](https://coveralls.io/repos/crysalead-js/sql-dialect/badge.svg)](https://coveralls.io/r/crysalead-js/sql-dialect)
 
 This library provides query builders independent of any particular database connection library.
