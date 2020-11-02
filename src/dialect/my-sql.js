@@ -9,7 +9,7 @@ const Delete = require('../statement/mysql/delete');
 const Truncate = require('../statement/truncate');
 const CreateTable = require('../statement/create-table');
 const DropTable = require('../statement/drop-table');
-const BLOB_COLUMNS = new Set(['text', 'blob', 'geometry', 'json']);
+const BLOB_COLUMNS = new Set(['longtext', 'mediumtext', 'text', 'blob', 'geometry', 'json']);
 
 /**
  * MySQL dialect.

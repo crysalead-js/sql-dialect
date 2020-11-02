@@ -354,6 +354,22 @@ describe("MySql Dialect", function() {
 
         var data = {
           name: 'fieldname',
+          use: 'longtext',
+          default: 'value'
+        };
+        var result = this.dialect.column(data);
+        expect(result).toBe('`fieldname` longtext');
+
+        var data = {
+          name: 'fieldname',
+          use: 'mediumtext',
+          default: 'value'
+        };
+        var result = this.dialect.column(data);
+        expect(result).toBe('`fieldname` mediumtext');
+
+        var data = {
+          name: 'fieldname',
           use: 'text',
           default: 'value'
         };
